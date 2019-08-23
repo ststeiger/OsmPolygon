@@ -63,19 +63,42 @@ namespace OsmPolygon
         }
 
 
+        public static string GetInsertPoints(string way)
+        {
+            return OSM.API.v0_6.Polygon.GetPointsInsert(way, "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA");
+        }
+
+
         static void Main(string[] args)
         {
-            GetInsertPoints();
-
+            // GetInsertPoints();
             // OSM.API.v0_6.Tests.TestBoundingBox();
             // OSM.API.v0_6.Tests.TestPolygonPoints();
+            // args = new string[] { "464651233", "95691336", "148117240", "104041936", "43012904", "49589463", "224285187", "58080194", "479999588", "218557958"  };
+            // args = new string[] { "224267897", "224269589" };
+            // args = new string[] { "58080208", "464651232" };
 
+
+            for (int i = 0; i < args.Length; ++i)
+            {
+                string way = args[i];
+                System.Console.WriteLine($"i[{i}]: {way}");
+
+                string script = GetInsertPoints(way);
+                System.IO.File.WriteAllText(way + ".sql", script, System.Text.Encoding.UTF8);
+                System.Console.WriteLine(script);
+            } // Next i 
 
             System.Console.WriteLine(" --- Press any key to continue --- ");
             while (!System.Console.KeyAvailable)
             {
                 System.Threading.Thread.Sleep(100);
             }
-        }
-    }
-}
+
+        } // End Sub Main 
+
+
+    } // End Class Program 
+
+
+} // End Namespace OsmPolygon 
