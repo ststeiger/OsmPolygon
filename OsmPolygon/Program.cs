@@ -1,4 +1,9 @@
 ﻿
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
 namespace OsmPolygon
 {
 
@@ -69,14 +74,159 @@ namespace OsmPolygon
         }
 
 
+        static void sub()
+        {
+            Microsoft.Extensions.DependencyInjection.ServiceCollection services =
+                new Microsoft.Extensions.DependencyInjection.ServiceCollection();
+
+            string dir = System.IO.Path.GetDirectoryName(typeof(Program).Assembly.Location);
+            // dir = System.IO.Directory.GetCurrentDirectory();
+
+            //Create configuration builder  
+            var configurationBuilder = new Microsoft.Extensions.Configuration.ConfigurationBuilder()
+                .SetBasePath(dir)
+                .AddIniFile("OsmPolygon.ini")
+                .AddJsonFile("appsettings.json", true);
+
+            Microsoft.Extensions.Configuration.IConfigurationRoot ic = configurationBuilder.Build();
+
+            services.ConfigureOptions(new ApplicationConfiguration(ic));
+
+            // Inject configuration  
+            services.AddSingleton<Microsoft.Extensions.Configuration.IConfiguration>(
+                delegate (System.IServiceProvider provider)
+                {
+                    return ic;
+                }
+            );
+
+            services.AddTransient<IConnectionFactory, ConnectionFactory>();
+            services.AddTransient<Des3EncryptionService>();
+
+
+            // Inject Serilog  
+            services.AddLogging(
+                delegate (Microsoft.Extensions.Logging.ILoggingBuilder options)
+            {
+                string logDir = System.IO.Path.GetDirectoryName(typeof(Program).Assembly.Location);
+                logDir = System.IO.Path.Combine(logDir, "Log");
+
+                if (!System.IO.Directory.Exists(logDir))
+                    System.IO.Directory.CreateDirectory(logDir);
+
+                /*
+                options.AddFileLogger(
+                    delegate (LdapService.Helpers.Log2.FileLoggerOptions fo)
+                    {
+                        fo.Folder = logDir;
+                        fo.LogLevel = LogLevel.Trace;
+                    }
+                );
+                */
+
+                options.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information);
+                options.AddFilter(x => x >= LogLevel.Trace);
+
+                options.AddConsole();
+                options.AddDebug();
+            });
+
+            // Inject common service  
+            // services.AddSingleton(typeof(ICommonService), typeof(CommonSampleService));
+
+            // Inject concrete implementaion of the service  
+            // services.AddSingleton(typeof(ServiceBase), typeof(Service1));
+
+            // Build DI provider  
+            ServiceProvider serviceProvider = services.BuildServiceProvider();
+
+
+            try
+            {
+                IConfiguration conf = serviceProvider.GetService<Microsoft.Extensions.Configuration.IConfiguration>();
+                System.Console.WriteLine(conf);
+
+                Newtonsoft.Json.Linq.JToken jtoken = ApplicationConfiguration.SerializeInstance(conf);
+                string json = jtoken.ToString();
+                System.Console.WriteLine(json);
+
+                var conf2 = serviceProvider.GetService<Microsoft.Extensions.Options.IOptions<ApplicationConfiguration>>();
+                System.Console.WriteLine(conf2);
+
+                IConnectionFactory fac = serviceProvider.GetService<IConnectionFactory>();
+
+                // System.Console.WriteLine(typeof(System.Data.SqlClient.SqlClientFactory).AssemblyQualifiedName);
+                // System.Console.WriteLine(typeof(Npgsql.NpgsqlFactory).AssemblyQualifiedName);
+                // System.Console.WriteLine(typeof(MySql.Data.MySqlClient.MySqlClientFactory).AssemblyQualifiedName);
+                System.Console.WriteLine(fac);
+            }
+            catch (System.Exception ex)
+            {
+                System.Console.Write(ex.Message);
+                System.Console.Write(ex.StackTrace);
+            }
+        }
+
+
+        public class ApplicationConfiguration
+            : Microsoft.Extensions.Options.IConfigureOptions<Microsoft.Extensions.Configuration.IConfiguration>
+        {
+
+            protected Microsoft.Extensions.Configuration.IConfiguration m_config;
+
+
+            public ApplicationConfiguration(Microsoft.Extensions.Configuration.IConfiguration options)
+            {
+                this.m_config = options;
+            }
+
+
+            public ApplicationConfiguration()
+                :this(null)
+            { }
+
+
+            void IConfigureOptions<Microsoft.Extensions.Configuration.IConfiguration>.Configure(Microsoft.Extensions.Configuration.IConfiguration options)
+            {
+                this.m_config = options;
+            }
+
+
+            public Newtonsoft.Json.Linq.JToken Serialize()
+            {
+                return SerializeInstance(this.m_config);
+            }
+
+
+            public static Newtonsoft.Json.Linq.JToken SerializeInstance(Microsoft.Extensions.Configuration.IConfiguration config)
+            {
+                Newtonsoft.Json.Linq.JObject obj = new Newtonsoft.Json.Linq.JObject();
+                foreach (Microsoft.Extensions.Configuration.IConfigurationSection child in config.GetChildren())
+                {
+                    obj.Add(child.Key, SerializeInstance(child));
+                }
+
+                if (!obj.HasValues && config is Microsoft.Extensions.Configuration.IConfigurationSection section)
+                    return new Newtonsoft.Json.Linq.JValue(section.Value);
+
+                return obj;
+            }
+
+        } // End Class ApplicationConfiguration 
+
+
         static void Main(string[] args)
         {
+            sub();
+
             // GetInsertPoints();
             // OSM.API.v0_6.Tests.TestBoundingBox();
             // OSM.API.v0_6.Tests.TestPolygonPoints();
             // args = new string[] { "464651233", "95691336", "148117240", "104041936", "43012904", "49589463", "224285187", "58080194", "479999588", "218557958"  };
             // args = new string[] { "224267897", "224269589" };
             // args = new string[] { "58080208", "464651232" };
+            // args = new string[] { "58080208", "464651232" };
+            args = new string[] { "690355074", "690355077", "690355073" };
 
 
             for (int i = 0; i < args.Length; ++i)
