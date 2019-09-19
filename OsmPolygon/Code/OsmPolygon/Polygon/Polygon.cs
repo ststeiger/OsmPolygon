@@ -32,17 +32,46 @@ namespace GeoApis
                 this.Points.Add(new DecimalVector2(p.lat, p.lng));
             } // Next p 
 
-            for (int i = 0; i < this.Points.Count-1; i++)
+            this.InitVectors();
+        } // End Constructor 
+
+
+
+        public Polygon(string points)
+            :this()
+        {
+            string[] pointArray = points.Split(';');
+
+            foreach (string pointPair in pointArray)
+            {
+                string[] coords = pointPair.Split(',');
+
+                System.Decimal x = 0;
+                System.Decimal y = 0;
+
+                System.Decimal.TryParse(coords[0], out x);
+                System.Decimal.TryParse(coords[1], out y);
+
+
+                this.Points.Add(new OpenToolkit.Mathematics.DecimalVector2(x, y));
+            } // Next p 
+
+            this.InitVectors();
+        }
+
+
+        public void InitVectors()
+        {
+            for (int i = 0; i < this.Points.Count - 1; i++)
             {
                 DecimalVector2 p1 = this.Points[i];
                 DecimalVector2 p2 = this.Points[i + 1];
 
                 this.Vectors.Add(DecimalVector2.Subtract(p2, p1));
             } // Next i 
+        }
 
-        } // End Constructor 
-        
-        
+
         public LatLng[] ToLatLngPoints()
         {
             LatLng[] ret = new LatLng[this.Points.Count];
