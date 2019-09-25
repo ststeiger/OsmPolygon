@@ -36,6 +36,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Dapper\Dapper.csproj" />
+    <ProjectReference Include="..\DotSpatial.Projections\DotSpatial.Projections.csproj" />
   </ItemGroup>
 
   <ItemGroup>

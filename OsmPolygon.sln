@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OsmPolygon", "OsmPolygon\Os
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapper", "Dapper\Dapper.csproj", "{905C4243-B3F8-4946-85A5-0FFB8C1BC466}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotSpatial.Projections", "DotSpatial.Projections\DotSpatial.Projections.csproj", "{C2259971-41E1-481E-89E3-3AE4C87F9F0A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{905C4243-B3F8-4946-85A5-0FFB8C1BC466}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{905C4243-B3F8-4946-85A5-0FFB8C1BC466}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{905C4243-B3F8-4946-85A5-0FFB8C1BC466}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2259971-41E1-481E-89E3-3AE4C87F9F0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2259971-41E1-481E-89E3-3AE4C87F9F0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2259971-41E1-481E-89E3-3AE4C87F9F0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2259971-41E1-481E-89E3-3AE4C87F9F0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

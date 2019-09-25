@@ -256,8 +256,10 @@ namespace OsmPolygon
 
         static void Main(string[] args)
         {
-            TestArea();
-            sub();
+            // EsriConverter.ESRI.ProjectEsriCoordinatesToWGS84();
+
+            // TestArea();
+            // sub();
 
             // GetInsertPoints();
             // OSM.API.v0_6.Tests.TestBoundingBox();
@@ -267,7 +269,7 @@ namespace OsmPolygon
             // args = new string[] { "58080208", "464651232" };
             // args = new string[] { "58080208", "464651232" };
             args = new string[] { "690355074", "690355077", "690355073" };
-
+            args = new string[] { "690355074" };
 
             for (int i = 0; i < args.Length; ++i)
             {
