@@ -17,7 +17,8 @@ namespace OsmPolygon
             // args = new string[] { "690355074" };
 
 
-            OsmPolyonFinder.GetAndInsertBuildingPolygon();
+            // Do it all automatically: 
+            // OsmPolyonFinder.GetAndInsertBuildingPolygon();
 
 
             for (int i = 0; i < args.Length; ++i)
