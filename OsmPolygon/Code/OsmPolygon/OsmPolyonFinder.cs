@@ -25,6 +25,8 @@ namespace OsmPolygon
         {
             System.Data.SqlClient.SqlConnectionStringBuilder csb = new System.Data.SqlClient.SqlConnectionStringBuilder();
 
+            
+
             csb.DataSource = System.Environment.MachineName;
             if (System.StringComparer.OrdinalIgnoreCase.Equals("COR", System.Environment.UserDomainName))
             {
@@ -35,8 +37,11 @@ namespace OsmPolygon
             // csb.InitialCatalog = "COR_Basic_Helvetia_IS";
             // csb.InitialCatalog = "TestDb";
             // csb.InitialCatalog = "COR_Basic_Helvetia_PS";
-            csb.InitialCatalog = "COR_Basic_SwissLife_UAT";
-            csb.InitialCatalog = "COR_Basic_Sursee";
+            // csb.InitialCatalog = "COR_Basic_SwissLife_UAT";
+            // csb.InitialCatalog = "COR_Basic_Sursee";
+
+            csb.DataSource = SecretManager.GetSecret<string>("DefaultDataSource");
+            csb.InitialCatalog = SecretManager.GetSecret<string>("DefaultCatalog");
 
 
             csb.IntegratedSecurity = false;
@@ -253,7 +258,7 @@ namespace OsmPolygon
         } // End Sub 
 
 
-        static void GetAndInsertBuildingPolygon()
+        public static void GetAndInsertBuildingPolygon()
         {
             string sql = @"
 INSERT INTO T_ZO_Objekt_Wgs84Polygon
