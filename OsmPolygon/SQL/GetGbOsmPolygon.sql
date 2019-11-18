@@ -30,6 +30,8 @@ SELECT
 	SET  GB_GM_Lat = CAST(''' + CAST(GB_GM_Lat AS varchar(36)) + ''' AS decimal(23,20)) 
 		,GB_GM_Lng = CAST(''' + CAST(GB_GM_Lng AS varchar(36))  + ''' AS decimal(23,20)) 
 WHERE GB_UID = ''' + CAST(GB_UID AS varchar(36)) + '''; ' AS sql 
+
+	-- ,'UPDATE T_AP_Gebaeude SET  GB_BK_UID = CAST(''' + CAST(GB_GK_UID AS varchar(36)) + ''' AS uniqueidentifier) WHERE GB_UID = ''' + CAST(GB_UID AS varchar(36)) + '''; ' AS GK_SQL 
 FROM T_AP_Gebaeude
 LEFT JOIN T_AP_Standort ON SO_UID = GB_SO_UID
 LEFT JOIN T_AP_Ref_Ort ON T_AP_Ref_Ort.ORT_UID = T_AP_Standort.SO_ORT_UID
