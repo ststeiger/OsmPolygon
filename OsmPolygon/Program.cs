@@ -15,11 +15,10 @@ namespace OsmPolygon
             // args = new string[] { "58080208", "464651232" };
             // args = new string[] { "690355074", "690355077", "690355073" };
             // args = new string[] { "690355074" };
-
+            //args = new string[] { "326116406", "176675521" };
 
             // Do it all automatically: 
             // OsmPolyonFinder.GetAndInsertBuildingPolygon();
-
 
             for (int i = 0; i < args.Length; ++i)
             {
