@@ -9,10 +9,12 @@ namespace OsmPolygon
 
         static void Main(string[] args)
         {
+            // Do it all automatically: 
+            // OsmPolyonFinder.GetAndInsertBuildingPolygon();
             // EsriConverter.ESRI.Test();
             // MoveMe.MoveMe.TestArea();
 
-
+            // Do it manually: 
             // args = new string[] { "464651233", "95691336", "148117240", "104041936", "43012904", "49589463", "224285187", "58080194", "479999588", "218557958"  };
             // args = new string[] { "224267897", "224269589" }; 
             // args = new string[] { "58080208", "464651232" };  
@@ -21,10 +23,7 @@ namespace OsmPolygon
             // args = new string[] { "690355074" }; 
             // args = new string[] { "326116406", "176675521" }; 
 
-            // Do it all automatically: 
-            // OsmPolyonFinder.GetAndInsertBuildingPolygon(); 
             args = new string[] { "100787726", "100787718", "337954728"}; 
-
 
             for (int i = 0; i < args.Length; ++i)
             { 
