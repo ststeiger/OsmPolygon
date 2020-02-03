@@ -22,8 +22,10 @@ namespace OsmPolygon
             // args = new string[] { "690355074", "690355077", "690355073" }; 
             // args = new string[] { "690355074" }; 
             // args = new string[] { "326116406", "176675521" }; 
+            // args = new string[] { "100787726", "100787718", "337954728"}; 
 
-            args = new string[] { "100787726", "100787718", "337954728"}; 
+            args = new string[] { "37037133" }; 
+
 
             for (int i = 0; i < args.Length; ++i)
             { 
