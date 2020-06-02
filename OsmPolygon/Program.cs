@@ -20,7 +20,9 @@ namespace OsmPolygon
             // args = new string[] { "100787726", "100787718", "337954728"}; 
 
             // args = new string[] { "37037133" };
-            args = new string[] { "377701803" };
+            // args = new string[] { "377701803" };
+            args = new string[] { "101768609", "442482822", "442482820" };
+            
 
             for (int i = 0; i < args.Length; ++i)
             {
@@ -41,7 +43,11 @@ namespace OsmPolygon
             // EsriConverter.ESRI.Test();
             // MoveMe.MoveMe.TestArea();
 
-            CreateImportScriptForPolygonByWayId(args);
+            // CreateImportScriptForPolygonByWayId(args);
+
+
+            OsmPolygonHelper.Test();
+
 
             WaitForExit();
         } // End Sub Main 

@@ -49,6 +49,7 @@ namespace OpenToolkit.Mathematics
         /// </summary>
         public decimal Y;
 
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DecimalVector2"/> struct.
         /// </summary>

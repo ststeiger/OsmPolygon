@@ -1,5 +1,6 @@
 ﻿
 using Dapper;
+using GeoApis;
 
 namespace OsmPolygon
 {
@@ -33,7 +34,7 @@ namespace OsmPolygon
 
             csb.DataSource = SecretManager.GetSecret<string>("DefaultDataSource");
             csb.InitialCatalog = SecretManager.GetSecret<string>("DefaultCatalog");
-            
+
             csb.IntegratedSecurity = false;
 
 
@@ -198,7 +199,7 @@ namespace OsmPolygon
             System.Xml.XmlNodeList buildings = doc.SelectNodes("//way[tag/@k=\"building\"]");
             foreach (System.Xml.XmlElement building in buildings)
             {
-                System.Collections.Generic.List<GeoApis.LatLng> lsPolygonPoints = 
+                System.Collections.Generic.List<GeoApis.LatLng> lsPolygonPoints =
                     new System.Collections.Generic.List<GeoApis.LatLng>();
 
                 System.Xml.XmlNodeList buildingNodes = building.SelectNodes("./nd");
@@ -226,6 +227,13 @@ namespace OsmPolygon
 
             foreach (System.Collections.Generic.KeyValuePair<string, GeoApis.Polygon> kvp in buildingPolygonDictionary)
             {
+                if (OsmPolygonHelper.IsInside(kvp.Value.Points, geoPoint))
+                {
+                    uid = kvp.Key;
+                    min = 0;
+                    break;
+                }
+
                 decimal minDist = kvp.Value.GetMinimumDistance(geoPoint);
 
                 if (min.HasValue)
