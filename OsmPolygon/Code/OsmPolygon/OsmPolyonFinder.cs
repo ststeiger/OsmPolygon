@@ -29,14 +29,25 @@ namespace OsmPolygon
             csb.DataSource = System.Environment.MachineName;
             if (System.StringComparer.OrdinalIgnoreCase.Equals("COR", System.Environment.UserDomainName))
             {
-                csb.DataSource += @"\SqlExpress";
+                // csb.DataSource = System.Environment.MachineName + @"\SqlExpress";
+                csb.DataSource = System.Environment.MachineName;
             }
+            else if (System.Environment.OSVersion.Platform == System.PlatformID.Unix)
+            {
+                csb.DataSource = System.Environment.MachineName + ",2017";
+            }
+
 
             csb.DataSource = SecretManager.GetSecret<string>("DefaultDataSource");
             csb.InitialCatalog = SecretManager.GetSecret<string>("DefaultCatalog");
 
-            csb.IntegratedSecurity = false;
 
+            csb.DataSource = "CORDB2016SP2";
+            csb.InitialCatalog = "HBD_CAFM_V4";
+
+
+
+            csb.IntegratedSecurity = false;
 
             csb.IntegratedSecurity = System.StringComparer.OrdinalIgnoreCase.Equals(System.Environment.UserDomainName, "COR");
             if (!csb.IntegratedSecurity)
@@ -252,6 +263,9 @@ namespace OsmPolygon
 
             } // Next kvp 
 
+            if (uid == null || !buildingPolygonDictionary.ContainsKey(uid))
+                return null;
+
             return buildingPolygonDictionary[uid];
         } // End Sub 
 
@@ -286,11 +300,22 @@ SELECT
 
             using (System.Data.Common.DbConnection connection = fac.Connection)
             {
-                System.Collections.Generic.List<BuildingToGeoCode> ls =
-                    System.Linq.Enumerable.ToList(connection.Query<BuildingToGeoCode>(
-                        "GetGbOsmPolygon.sql"
-                        , typeof(OsmPolyonFinder)
-                    )
+                bool isZH = connection.ExecuteScalar<bool>("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE (1=1) AND TABLE_TYPE= 'BASE TABLE' AND TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'T_GebaeudeIMMO' ");
+                bool isRe = connection.ExecuteScalar<bool>("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE (1=1) AND TABLE_TYPE= 'BASE TABLE' AND TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'T_Premises' ");
+
+                string queryFile = "GetGbOsmPolygon.sql";
+                if (isZH)
+                    queryFile = "GetGbOsmPolygon_STZH.sql";
+                else if (isRe)
+                {
+                    queryFile = "GetGbOsmPolygon_RE.sql";
+                    throw new System.NotImplementedException("Query for RE not implemented.");
+                }
+                    
+
+
+                System.Collections.Generic.List<BuildingToGeoCode> ls = System.Linq.Enumerable.ToList(
+                    connection.Query<BuildingToGeoCode>(queryFile, typeof(OsmPolyonFinder) )
                 );
 
                 foreach (BuildingToGeoCode building in ls)
@@ -300,6 +325,7 @@ SELECT
                     GeoApis.Polygon nearestBuilding = GetNearestBuildingPolygon(building.GB_GM_Lat, building.GB_GM_Lng);
                     if (nearestBuilding == null)
                         continue;
+
                     System.Console.WriteLine(nearestBuilding);
                     System.Console.WriteLine(nearestBuilding.OsmId); // 218003784
 

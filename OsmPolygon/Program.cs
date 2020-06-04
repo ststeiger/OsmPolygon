@@ -39,14 +39,14 @@ namespace OsmPolygon
         static void Main(string[] args)
         {
             // Do it all automatically: 
-            // OsmPolyonFinder.GetAndInsertBuildingPolygon();
+            OsmPolyonFinder.GetAndInsertBuildingPolygon();
             // EsriConverter.ESRI.Test();
             // MoveMe.MoveMe.TestArea();
 
             // CreateImportScriptForPolygonByWayId(args);
 
 
-            OsmPolygonHelper.Test();
+            // OsmPolygonHelper.Test();
 
 
             WaitForExit();

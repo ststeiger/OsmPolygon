@@ -6,14 +6,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="SQL\CodeToInsertIntoArbitraryWebsite.js" />
     <None Remove="SQL\GetBuildingAddress.sql" />
     <None Remove="SQL\GetBuildingForWay.sql" />
     <None Remove="SQL\GetGbOsmPolygon.sql" />
+    <None Remove="SQL\GetGbOsmPolygon_STZH.sql" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="SQL\GetBuildingAddress.sql" />
     <EmbeddedResource Include="SQL\GetBuildingForWay.sql" />
+    <EmbeddedResource Include="SQL\GetGbOsmPolygon_STZH.sql" />
     <EmbeddedResource Include="SQL\GetGbOsmPolygon.sql" />
   </ItemGroup>
 
