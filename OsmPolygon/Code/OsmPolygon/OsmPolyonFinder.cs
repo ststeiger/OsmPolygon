@@ -41,12 +41,6 @@ namespace OsmPolygon
             csb.DataSource = SecretManager.GetSecret<string>("DefaultDataSource");
             csb.InitialCatalog = SecretManager.GetSecret<string>("DefaultCatalog");
 
-
-            csb.DataSource = "CORDB2016SP2";
-            csb.InitialCatalog = "HBD_CAFM_V4";
-
-
-
             csb.IntegratedSecurity = false;
 
             csb.IntegratedSecurity = System.StringComparer.OrdinalIgnoreCase.Equals(System.Environment.UserDomainName, "COR");
