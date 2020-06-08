@@ -1,6 +1,7 @@
 ﻿
 using Dapper;
-
+using System;
+using System.Reflection.Metadata.Ecma335;
 
 namespace OsmPolygon
 {
@@ -15,6 +16,36 @@ namespace OsmPolygon
         public string GB_Adresse;
         public decimal GB_GM_Lat;
         public decimal GB_GM_Lng;
+    }
+
+
+    public class WebClientWithCustomTimeout 
+        : System.Net.WebClient
+    {
+
+        protected int m_timeOut;
+
+
+        public WebClientWithCustomTimeout()
+            : base()
+        {
+            this.m_timeOut = 5;
+        }
+
+
+        public WebClientWithCustomTimeout(int timeOut)
+            : base()
+        {
+            this.m_timeOut = timeOut;
+        }
+
+
+        protected override System.Net.WebRequest GetWebRequest(Uri uri)
+        {
+            System.Net.WebRequest w = base.GetWebRequest(uri);
+            w.Timeout = this.m_timeOut * 1000;
+            return w;
+        }
     }
 
 
@@ -40,6 +71,7 @@ namespace OsmPolygon
 
             csb.DataSource = SecretManager.GetSecret<string>("DefaultDataSource");
             csb.InitialCatalog = SecretManager.GetSecret<string>("DefaultCatalog");
+
 
             csb.IntegratedSecurity = false;
 
@@ -155,16 +187,82 @@ namespace OsmPolygon
             // string url = "https://www.openstreetmap.org/api/0.6/map?bbox=8.626273870468141,47.69679769756054,8.636573553085329,47.700530864557194&no_cache=1562588642802";
             string url = "https://www.openstreetmap.org/api/" + OSM_API_VERSION + "/map?bbox=" + bounds.ToBBoxString();
 
+
+
             string[] proxyList = ProxyHelper.GetProxyArray();
-            string proxy = proxyList[s_rnd.Next(0, proxyList.Length)];
+            string proxy = null;
 
+        REPEAT_UNTIL_SUCCESS:
+            proxy = proxyList[s_rnd.Next(0, proxyList.Length)];
 
-            using (System.Net.WebClient wc = new System.Net.WebClient())
+            // proxy = "139.162.38.191:80";
+            // proxy = "178.128.51.105";
+            // proxy = "105.27.237.27:80";
+
+            proxy = "161.117.251.194:80";
+            proxy = "42.3.51.114:80";
+            proxy = "173.212.202.65:80";
+            proxy = "47.91.105.34:80";
+
+            try
             {
-                // wc.Proxy = new System.Net.WebProxy(proxy);
 
-                xml = wc.DownloadString(url);
-            } // End Using wc 
+                using (System.Net.WebClient wc = new WebClientWithCustomTimeout(15))
+                {
+                    // wc.Proxy = new System.Net.WebProxy(proxy);
+
+                    xml = wc.DownloadString(url);
+                } // End Using wc 
+            }
+            catch (System.Net.WebException webEx)
+            {
+                System.Console.WriteLine(webEx.Message);
+                System.Console.WriteLine(webEx.Status);
+
+                if (webEx.Status == System.Net.WebExceptionStatus.Timeout)
+                {
+                    System.Console.WriteLine("Timeout ! ");
+                }
+                else if (webEx.Status == System.Net.WebExceptionStatus.ProtocolError)
+                {
+                    System.Console.WriteLine("ProtocolError");
+                }
+
+                System.Net.HttpWebResponse response = webEx.Response as System.Net.HttpWebResponse;
+                if (response != null)
+                {
+                    System.Console.WriteLine("HTTP Status Code: " + response.StatusCode.ToString() + ", " + response.StatusDescription);
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        System.Console.WriteLine("401");
+                    }
+
+                    string responseHtml = null;
+                    using (System.IO.Stream responseStream = response.GetResponseStream())
+                    {
+                        using (System.IO.TextReader tr = new System.IO.StreamReader(responseStream))
+                        {
+                            responseHtml = tr.ReadToEnd();
+                        }
+                    }
+
+                    System.Console.WriteLine(responseHtml);
+                }
+                else
+                {
+                    // no http status code available
+                }
+
+                goto REPEAT_UNTIL_SUCCESS;
+            }
+            catch (System.Exception ex)
+            {
+                System.Console.WriteLine(ex.Message);
+                goto REPEAT_UNTIL_SUCCESS;
+            }
+
+
 #endif
 
             System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
