@@ -27,10 +27,8 @@ namespace OsmPolygon
 
 
         public WebClientWithCustomTimeout()
-            : base()
-        {
-            this.m_timeOut = 5;
-        }
+            : this(5)
+        { }
 
 
         public WebClientWithCustomTimeout(int timeOut)
@@ -71,7 +69,6 @@ namespace OsmPolygon
 
             csb.DataSource = SecretManager.GetSecret<string>("DefaultDataSource");
             csb.InitialCatalog = SecretManager.GetSecret<string>("DefaultCatalog");
-
 
             csb.IntegratedSecurity = false;
 
@@ -206,7 +203,6 @@ namespace OsmPolygon
 
             try
             {
-
                 using (System.Net.WebClient wc = new WebClientWithCustomTimeout(15))
                 {
                     // wc.Proxy = new System.Net.WebProxy(proxy);
@@ -254,16 +250,16 @@ namespace OsmPolygon
                     // no http status code available
                 }
 
-                goto REPEAT_UNTIL_SUCCESS;
+                // goto REPEAT_UNTIL_SUCCESS;
             }
             catch (System.Exception ex)
             {
                 System.Console.WriteLine(ex.Message);
-                goto REPEAT_UNTIL_SUCCESS;
+                // goto REPEAT_UNTIL_SUCCESS;
             }
 
-
 #endif
+
 
             System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
             doc.LoadXml(xml);
