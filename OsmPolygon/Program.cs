@@ -34,8 +34,9 @@ namespace OsmPolygon
                 System.Console.WriteLine(script);
             } // Next i 
 
+        } // End Sub CreateImportScriptForPolygonByWayId 
 
-        }
+
         static void Main(string[] args)
         {
             // Do it all automatically: 
@@ -63,7 +64,7 @@ namespace OsmPolygon
                 System.Threading.Thread.Sleep(100);
             } // Whend 
 
-        }
+        } // End Sub WaitForExit 
 
 
     } // End Class Program 
