@@ -1,7 +1,6 @@
 ﻿
 using Dapper;
-using System;
-using System.Reflection.Metadata.Ecma335;
+
 
 namespace OsmPolygon
 {
@@ -16,34 +15,6 @@ namespace OsmPolygon
         public string GB_Adresse;
         public decimal GB_GM_Lat;
         public decimal GB_GM_Lng;
-    }
-
-
-    public class WebClientWithCustomTimeout 
-        : System.Net.WebClient
-    {
-
-        protected int m_timeOut;
-
-
-        public WebClientWithCustomTimeout()
-            : this(5)
-        { }
-
-
-        public WebClientWithCustomTimeout(int timeOut)
-            : base()
-        {
-            this.m_timeOut = timeOut;
-        }
-
-
-        protected override System.Net.WebRequest GetWebRequest(Uri uri)
-        {
-            System.Net.WebRequest w = base.GetWebRequest(uri);
-            w.Timeout = this.m_timeOut * 1000;
-            return w;
-        }
     }
 
 
@@ -69,6 +40,10 @@ namespace OsmPolygon
 
             csb.DataSource = SecretManager.GetSecret<string>("DefaultDataSource");
             csb.InitialCatalog = SecretManager.GetSecret<string>("DefaultCatalog");
+
+
+            csb.DataSource = System.Environment.MachineName;
+            csb.InitialCatalog = "COR_Basic_KantonLuzern";
 
             csb.IntegratedSecurity = false;
 

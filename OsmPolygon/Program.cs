@@ -21,8 +21,8 @@ namespace OsmPolygon
 
             // args = new string[] { "37037133" };
             // args = new string[] { "377701803" };
-            args = new string[] { "101768609", "442482822", "442482820" };
-            
+            // args = new string[] { "101768609", "442482822", "442482820" };
+            args = new string[] { "231594843" };
 
             for (int i = 0; i < args.Length; ++i)
             {
@@ -39,19 +39,21 @@ namespace OsmPolygon
 
         static void Main(string[] args)
         {
+            Unionizer.Test();
+
             // Do it all automatically: 
             OsmPolyonFinder.GetAndInsertBuildingPolygon();
             // EsriConverter.ESRI.Test();
             // MoveMe.MoveMe.TestArea();
 
-            // CreateImportScriptForPolygonByWayId(args);
+            CreateImportScriptForPolygonByWayId(args);
 
 
             // OsmPolygonHelper.Test();
 
 
             WaitForExit();
-        } // End Sub Main 
+         } // End Sub Main 
 
 
         public static void WaitForExit()

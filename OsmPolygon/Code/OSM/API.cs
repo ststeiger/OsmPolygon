@@ -169,12 +169,17 @@ VALUES
         public GeoPoint()
         { } // End Constructor 
 
-
         public GeoPoint(decimal latitude, decimal longitude)
         {
             this.Latitude = latitude;
             this.Longitude = longitude;
         } // End Constructor 
+
+
+        public GeoPoint(double latitude, double longitude)
+            : this((decimal)latitude, (decimal)longitude)
+        { }
+
 
     } // End Class GeoPoint 
 

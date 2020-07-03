@@ -1,0 +1,114 @@
+﻿{
+        "tabs": [
+            {
+                "favIconUrl": "https://en.wikipedia.org/static/favicon/wikipedia.ico",
+                "title": "Comparison of mail servers - Wikipedia",
+                "url": "https://en.wikipedia.org/wiki/Comparison_of_mail_servers"
+            },
+            {
+                "favIconUrl": "https://github.githubassets.com/favicons/favicon.svg",
+                "title": "Zimbra",
+                "url": "https://github.com/Zimbra?q=&type=&language="
+            },
+            {
+                "favIconUrl": "https://cloud7.news/wp-content/uploads/2020/06/cropped-ms-icon-310x310-1-32x32.png",
+                "title": "7 best Linux mail servers in 2020 - Cloud7",
+                "url": "https://cloud7.news/linux/7-best-linux-mail-servers/"
+            },
+            {
+                "favIconUrl": "https://github.githubassets.com/favicons/favicon.svg",
+                "title": "Exim/exim: Exim Mail Transport Agent - source, testsuite and documentation",
+                "url": "https://github.com/Exim/exim"
+            },
+            {
+                "favIconUrl": "https://github.githubassets.com/favicons/favicon.svg",
+                "title": "dovecot/core: Dovecot mail server",
+                "url": "https://github.com/dovecot/core"
+            },
+            {
+                "favIconUrl": "https://github.githubassets.com/favicons/favicon.svg",
+                "title": "vdukhovni/postfix: Postfix MTA by Wietse Venema",
+                "url": "https://github.com/vdukhovni/postfix"
+            },
+            {
+                "favIconUrl": "https://github.githubassets.com/favicons/favicon.svg",
+                "title": "svarshavchik/courier: Courier Mail Server",
+                "url": "https://github.com/svarshavchik/courier"
+            },
+            {
+                "favIconUrl": "https://github.githubassets.com/favicons/favicon.svg",
+                "title": "cntemple/Citadel",
+                "url": "https://github.com/cntemple/Citadel/"
+            },
+            {
+                "favIconUrl": "https://www.dovecot.org/typo3conf/ext/dvc_content/Resources/Public/Icons/Favicons/favicon-32x32.png",
+                "title": "Dovecot",
+                "url": "https://www.dovecot.org/"
+            },
+            {
+                "title": "Submission Server — Dovecot documentation",
+                "url": "https://doc.dovecot.org/admin_manual/submission_server/"
+            },
+            {
+                "favIconUrl": "https://github.githubassets.com/favicons/favicon.svg",
+                "title": "cyrusimap/cyrus-imapd: Cyrus IMAP is an email, contacts and calendar server",
+                "url": "https://github.com/cyrusimap/cyrus-imapd"
+            },
+            {
+                "favIconUrl": "https://github.githubassets.com/favicons/favicon.svg",
+                "title": "cosullivan/SmtpServer: A SMTP Server component written in C#",
+                "url": "https://github.com/cosullivan/SmtpServer"
+            },
+            {
+                "title": "Postal - The open source mail server",
+                "url": "https://postal.atech.media/"
+            },
+            {
+                "favIconUrl": "https://github.githubassets.com/favicons/favicon.svg",
+                "title": "postalhq/postal: 📨 A fully featured open source mail delivery platform for incoming & outgoing e-mail",
+                "url": "https://github.com/postalhq/postal"
+            },
+            {
+                "favIconUrl": "https://github.githubassets.com/favicons/favicon.svg",
+                "title": "flashmob/go-guerrilla: Mini SMTP server written in golang",
+                "url": "https://github.com/flashmob/go-guerrilla"
+            },
+            {
+                "favIconUrl": "https://wiki2.dovecot.org/favicon.ico",
+                "title": "MailboxFormat/Maildir - Dovecot Wiki",
+                "url": "https://wiki2.dovecot.org/MailboxFormat/Maildir"
+            },
+            {
+                "favIconUrl": "https://www.google.com/favicon.ico",
+                "title": "maildir mailkit - Google Search",
+                "url": "https://www.google.com/search?hl=en&output=search&sclient=psy-ab&q=maildir%20mailkit&cad=h"
+            },
+            {
+                "favIconUrl": "https://www.google.com/favicon.ico",
+                "title": "maildir format csharp - Google Search",
+                "url": "https://www.google.com/search?hl=en&sxsrf=ALeKk02zJABWI0lf9hV_bTX1OTBSCGa_oA%3A1593777184863&ei=IBz_XpSxNI_BgQa__oyACQ&q=maildir+format+csharp&oq=maildir+format+csharp&gs_lcp=CgZwc3ktYWIQAzoECAAQRzoECCMQJzoICAAQgwEQkQI6BAgAEEM6BQgAEJECOgUIABCxAzoFCAAQgwE6BwgAEBQQhwI6CggAELEDEBQQhwI6CggAEIMBEBQQhwI6AggAOgQIABAKOgYIABAWEB46BQghEKABOgQIIRAVOgcIIRAKEKABUL_WB1jG8AdgzvIHaABwAXgAgAGpAYgBzg6SAQQxOC4zmAEAoAEBqgEHZ3dzLXdpeg&sclient=psy-ab&ved=0ahUKEwiUwdHXgrHqAhWPYMAKHT8_A5AQ4dUDCAw&uact=5"
+            },
+            {
+                "favIconUrl": "https://cdn.sstatic.net/Sites/stackoverflow/Img/favicon.ico?v=ec617d715196",
+                "title": "email - Reading an mbox file in C# - Stack Overflow",
+                "url": "https://stackoverflow.com/questions/903711/reading-an-mbox-file-in-c-sharp"
+            },
+            {
+                "favIconUrl": "https://github.githubassets.com/favicons/favicon.svg",
+                "title": "jstedfast/MailKit: A cross-platform .NET library for IMAP, POP3, and SMTP.",
+                "url": "https://github.com/jstedfast/MailKit"
+            },
+            {
+                "favIconUrl": "https://github.githubassets.com/favicons/favicon.svg",
+                "title": "redmine-net-api/MimeFormat.cs at master · zapadi/redmine-net-api",
+                "url": "https://github.com/zapadi/redmine-net-api/blob/master/src/redmine-net-api/MimeFormat.cs"
+            },
+            {
+                "favIconUrl": "https://ubuntupit.com/wp-content/uploads/2018/07/favicon.ico",
+                "title": "Top 20 Best Linux Mail Server Software and Solutions in 2020",
+                "url": "https://www.ubuntupit.com/best-linux-mail-server-software-and-solutions/"
+            }
+        ],
+        "title": "MailServer",
+        "time": 1593787824591
+    },
