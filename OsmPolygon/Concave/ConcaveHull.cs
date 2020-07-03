@@ -12,6 +12,11 @@ namespace NetTopologySuite.Hull
         private readonly Geometry _geom;
         private readonly double _tolerance;
 
+        public System.Collections.Generic.Dictionary<Coordinate,int> coordinates = new System.Collections.Generic.Dictionary<Coordinate, int>();
+        public System.Collections.Generic.Dictionary<int, Vertex> vertices = new System.Collections.Generic.Dictionary<int, Vertex>();
+        
+        
+        
         public ConcaveHull(Geometry geom, double tolerance)
         {
             _geom = geom;
@@ -21,10 +26,35 @@ namespace NetTopologySuite.Hull
         public Geometry GetResult()
         {
             var subdiv = BuildDelaunay();
-            var tris = ExtractTriangles(subdiv);
-            var hull = ComputeHull(tris);
+            var qeTriangles = ExtractTriangles(subdiv);
+            
+            List<Vertex[]> qeVertices =  GetVertices(qeTriangles, false);;
+            
+            int iV = 0;
+            foreach(Vertex[] v in qeVertices) 
+            {
+                this.coordinates[v[0].Coordinate] = iV;
+                
+                this.vertices[iV] = new Vertex(v[0].X, v[0].Y); // note: has ID
+                iV++;
+            }
+            
+            var hull = ComputeHull(qeTriangles);
             return hull;
         }
+
+        private static List<Vertex[]> GetVertices(IList<QuadEdgeTriangle> ls, bool b)
+        {
+            List<Vertex[]> qeVertices = new List<Vertex[]>();
+            
+            foreach (QuadEdgeTriangle thisTriangle in ls)
+            {
+                qeVertices.Add(thisTriangle.GetVertices());
+            }
+            
+            return qeVertices;
+        }
+
 
         private static IList<QuadEdgeTriangle> ExtractTriangles(QuadEdgeSubdivision subdiv)
         {

@@ -3,6 +3,7 @@
 
 
 using System.Linq;
+using NetTopologySuite.Geometries;
 
 namespace OsmPolygon
 {
@@ -44,10 +45,10 @@ namespace OsmPolygon
                 Newtonsoft.Json.JsonConvert.DeserializeObject<System.Collections.Generic.List<System.Collections.Generic.List<OSM.API.v0_6.GeoPoint>>>(a);
 
             System.Collections.Generic.List<OSM.API.v0_6.GeoPoint> lsUnionPolygonPoints = GetUnionPolygon(ls);
-            string insertString = CreateInsertScript(lsUnionPolygonPoints);
+            string insertString = CreateInsertScript(lsUnionPolygonPoints, "1a23fd48-406e-4d20-8693-4b8786234d37");
             System.Console.WriteLine(insertString);
         }
-
+// http://www.rotefabrik.free.fr/concave_hull/
 
         public static System.Collections.Generic.List<OSM.API.v0_6.GeoPoint> GetUnionPolygon(
             System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<OSM.API.v0_6.GeoPoint>> polygons)
@@ -74,25 +75,31 @@ namespace OsmPolygon
 
             NetTopologySuite.Geometries.MultiPolygon lalala = (NetTopologySuite.Geometries.MultiPolygon)ig;
 
-
-
+            var convaveHull = ConcaveHull.Init.foo(lalala.Coordinates);
+            convaveHull = ToCounterClockWise(convaveHull);
+            
+            return convaveHull;
+            
+            
+            
+            
             ig = lalala.ConvexHull();
             // var cc = new NetTopologySuite.Hull.ChiShape(ig, double.Epsilon);
             // ig = cc.GetResult();
             
             NetTopologySuite.Geometries.Polygon unionPolygon = (NetTopologySuite.Geometries.Polygon)ig;
             System.Console.WriteLine(unionPolygon.Shell.Coordinates);
-
-
+            
+            
             System.Collections.Generic.List<OSM.API.v0_6.GeoPoint> lsUnionPolygonPoints = new System.Collections.Generic.List<OSM.API.v0_6.GeoPoint>();
-
+            
             for (int i = 0; i < unionPolygon.Shell.Coordinates.Length; ++i)
             {
                 lsUnionPolygonPoints.Add(new OSM.API.v0_6.GeoPoint(unionPolygon.Shell.Coordinates[i].X, unionPolygon.Shell.Coordinates[i].Y));
             }
-
+            
             lsUnionPolygonPoints = ToCounterClockWise(lsUnionPolygonPoints);
-
+            
             return lsUnionPolygonPoints;
         }
 
@@ -146,8 +153,12 @@ namespace OsmPolygon
         } // End Function ToNetTopologyCoordinates 
 
 
-
         public static string CreateInsertScript(System.Collections.Generic.List<OSM.API.v0_6.GeoPoint> coords)
+        {
+            return CreateInsertScript(coords, System.Guid.NewGuid().ToString().Replace("0","A"));
+        }
+
+        public static string CreateInsertScript(System.Collections.Generic.List<OSM.API.v0_6.GeoPoint> coords, string gb_uid)
         {
             // Close polygon if unclosed
             if (coords[0].Latitude != coords[coords.Count - 1].Latitude || coords[0].Longitude != coords[coords.Count - 1].Longitude)
@@ -157,7 +168,7 @@ namespace OsmPolygon
 DECLARE @GB_UID AS uniqueidentifier;
 DECLARE @SO_UID AS uniqueidentifier;
 
-SET @GB_UID = NULLIF('abc', '');
+SET @GB_UID = NULLIF('" + gb_uid + @"', '');
 SET @SO_UID = NULLIF('', '');
 
 

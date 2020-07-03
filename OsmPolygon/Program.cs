@@ -1,12 +1,15 @@
 ﻿
+using Dapper;
+
+    
 namespace OsmPolygon
 {
-
-
+    
+    
     class Program
     {
-
-
+        
+        
         public static void CreateImportScriptForPolygonByWayId(string[] args)
         {
             // Do it manually: 
@@ -22,7 +25,7 @@ namespace OsmPolygon
             // args = new string[] { "37037133" };
             // args = new string[] { "377701803" };
             // args = new string[] { "101768609", "442482822", "442482820" };
-            args = new string[] { "231594843" };
+            args = new string[] {"231594843"};
 
             for (int i = 0; i < args.Length; ++i)
             {
@@ -33,12 +36,67 @@ namespace OsmPolygon
                 System.IO.File.WriteAllText(way + ".sql", script, System.Text.Encoding.UTF8);
                 System.Console.WriteLine(script);
             } // Next i 
-
+            
         } // End Sub CreateImportScriptForPolygonByWayId 
+        
+        
+        public static void TestNpgSql()
+        {
+            var a = new {Test = 5, Result = "Success"};
+            var b = new {Test = 3, Result = "foo"};
+            var c = new {Test1 = 3, Result = "foo"};
+
+            System.Type t = a.GetType();
+            System.Console.WriteLine(t);
+
+            if (object.ReferenceEquals(a.GetType(), b.GetType()))
+                System.Console.WriteLine("Two anony = equal");
+
+
+            Npgsql.NpgsqlConnectionStringBuilder csb = new Npgsql.NpgsqlConnectionStringBuilder();
+
+            csb.Database = "osm_test"; // must be set
+
+            csb.Host = "localhost";
+            // csb.Host = "127.0.0.1"; // doesn't work
+            // csb.Host = System.Environment.MachineName; // doesn't work 
+            csb.Port = 5432;
+
+            csb.IntegratedSecurity = true;
+            csb.Username = System.Environment.UserName; // Works when user exists
+            // csb.Username = "postgres"; // works as root 
+
+            object obj = null;
+            string sql = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public'; ";
+
+            using (System.Data.Common.DbConnection conn = Npgsql.NpgsqlFactory.Instance.CreateConnection())
+            {
+                conn.ConnectionString = csb.ConnectionString;
+
+                bool ret = conn.ExecuteScalar<bool>(sql);
+                System.Console.WriteLine(ret);
+
+                if (conn.State != System.Data.ConnectionState.Open)
+                    conn.Open();
+
+                using (System.Data.Common.DbCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = sql;
+                    obj = cmd.ExecuteScalar();
+                }
+
+                if (conn.State != System.Data.ConnectionState.Closed)
+                    conn.Close();
+            }
+
+            System.Console.WriteLine(obj);
+        } // End Sub TestNpgSql 
 
 
         static void Main(string[] args)
         {
+            // TestNpgSql();
+
             Unionizer.Test();
 
             // Do it all automatically: 
@@ -48,12 +106,10 @@ namespace OsmPolygon
 
             CreateImportScriptForPolygonByWayId(args);
 
-
             // OsmPolygonHelper.Test();
 
-
             WaitForExit();
-         } // End Sub Main 
+        } // End Sub Main 
 
 
         public static void WaitForExit()
@@ -65,11 +121,10 @@ namespace OsmPolygon
             {
                 System.Threading.Thread.Sleep(100);
             } // Whend 
-
         } // End Sub WaitForExit 
-
-
+        
+        
     } // End Class Program 
-
-
+    
+    
 } // End Namespace OsmPolygon 
