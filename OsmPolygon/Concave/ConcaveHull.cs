@@ -1,12 +1,11 @@
 ﻿
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
+
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Implementation;
-using NetTopologySuite.Operation.Linemerge;
 using NetTopologySuite.Triangulate;
 using NetTopologySuite.Triangulate.QuadEdge;
-using NetTopologySuite.Utilities;
 using OsmPolygon.Concave;
 
 namespace NetTopologySuite.Hull
@@ -22,18 +21,18 @@ namespace NetTopologySuite.Hull
         private GeometryFactory geomFactory;
         private readonly GeometryCollection geometries;
         private double threshold;
+        
+        
+        public Dictionary<LineSegment, int> segments = new Dictionary<LineSegment, int>();
+        public Dictionary<int, Edge> edges = new Dictionary<int, Edge>();
+        public Dictionary<int, OsmPolygon.Concave.Triangle> triangles = new Dictionary<int, OsmPolygon.Concave.Triangle>();
+        public SortedDictionary<int, Edge> lengths = new SortedDictionary<int, Edge>();
 
+        public Dictionary<int, Edge> shortLengths = new Dictionary<int, Edge>();
 
-        public System.Collections.Generic.Dictionary<LineSegment, int> segments = new System.Collections.Generic.Dictionary<LineSegment, int>();
-        public System.Collections.Generic.Dictionary<int, Edge> edges = new System.Collections.Generic.Dictionary<int, Edge>();
-        public System.Collections.Generic.Dictionary<int, OsmPolygon.Concave.Triangle> triangles = new System.Collections.Generic.Dictionary<int, OsmPolygon.Concave.Triangle>();
-        public System.Collections.Generic.SortedDictionary<int, Edge> lengths = new System.Collections.Generic.SortedDictionary<int, Edge>();
-
-        public System.Collections.Generic.Dictionary<int, Edge> shortLengths = new System.Collections.Generic.Dictionary<int, Edge>();
-
-        public System.Collections.Generic.Dictionary<Coordinate, int> coordinates = new System.Collections.Generic.Dictionary<Coordinate, int>();
-        public System.Collections.Generic.Dictionary<int, Vertex> vertices = new System.Collections.Generic.Dictionary<int, Vertex>();
-
+        public Dictionary<Coordinate, int> coordinates = new Dictionary<Coordinate, int>();
+        public Dictionary<int, Vertex> vertices = new Dictionary<int, Vertex>();
+        
 
 
         public ConcaveHull(Geometry geometry, double threshold)
@@ -53,7 +52,7 @@ namespace NetTopologySuite.Hull
 
         private static GeometryCollection transformIntoPointGeometryCollection(Geometry geom)
         {
-            UniqueCoordinateArrayFilter filter = new UniqueCoordinateArrayFilter();
+            NetTopologySuite.Utilities.UniqueCoordinateArrayFilter filter = new NetTopologySuite.Utilities.UniqueCoordinateArrayFilter();
             geom.Apply(filter);
             Coordinate[] coord = filter.Coordinates;
 
@@ -73,7 +72,7 @@ namespace NetTopologySuite.Hull
 	    // @return a geometry collection
         private static GeometryCollection transformIntoPointGeometryCollection(GeometryCollection gc)
         {
-            UniqueCoordinateArrayFilter filter = new UniqueCoordinateArrayFilter();
+            NetTopologySuite.Utilities.UniqueCoordinateArrayFilter filter = new NetTopologySuite.Utilities.UniqueCoordinateArrayFilter();
             gc.Apply(filter);
             Coordinate[] coord = filter.Coordinates;
 
@@ -93,7 +92,7 @@ namespace NetTopologySuite.Hull
         {
             QuadEdgeSubdivision qes = BuildDelaunay();
             IList<QuadEdge> quadEdges = qes.GetEdges();
-            IList<QuadEdgeTriangle> qeTriangles = ExtractTriangles(qes);
+            IList<QuadEdgeTriangle> qeTriangles = QuadEdgeTriangle.CreateOn(qes);
             IEnumerable<Vertex> qeVertices = qes.GetVertices(false);
 
             int iV = 0;
@@ -103,12 +102,11 @@ namespace NetTopologySuite.Hull
                 this.vertices[iV] = new Vertex(iV, v.Coordinate); 
                 iV++;
             }
-
+            
             List<QuadEdge> qeFrameBorder = new List<QuadEdge>();
             List<QuadEdge> qeFrame = new List<QuadEdge>();
             List<QuadEdge> qeBorder = new List<QuadEdge>();
-
-
+            
             foreach (QuadEdge qe in quadEdges)
             {
                 if (qes.IsFrameBorderEdge(qe))
@@ -125,7 +123,6 @@ namespace NetTopologySuite.Hull
             // border
             for (int j = 0; j < qeFrameBorder.Count; j++)
             {
-
                 QuadEdge q = qeFrameBorder[j];
                 if (!qeFrame.Contains(q))
                 {
@@ -150,14 +147,12 @@ namespace NetTopologySuite.Hull
             QuadEdgeComparer dc = new QuadEdgeComparer();
             //SortedDictionary<QuadEdge, double> qeSorted = new SortedDictionary<QuadEdge, double>(qeDistances, dc);
             SortedDictionary<QuadEdge, double> qeSorted = new SortedDictionary<QuadEdge, double>(dc);
-            foreach (var x in qeDistances)
+            foreach (KeyValuePair<QuadEdge, double> thisDistance in qeDistances)
             {
                 // qeSorted.Add(x.Key, x.Value);
-                qeSorted[x.Key] = x.Value;
+                qeSorted[thisDistance.Key] = thisDistance.Value;
             }
-
-
-
+            
             // edges creation
             int i = 0;
             foreach (QuadEdge qe in qeSorted.Keys)
@@ -216,13 +211,13 @@ namespace NetTopologySuite.Hull
                 Edge edgeC = this.edges[this.segments[sC]];
 
                 OsmPolygon.Concave.Triangle triangle = new OsmPolygon.Concave.Triangle(i, qet.IsBorder() ? true : false);
-                triangle.addEdge(edgeA);
-                triangle.addEdge(edgeB);
-                triangle.addEdge(edgeC);
+                triangle.AddEdge(edgeA);
+                triangle.AddEdge(edgeB);
+                triangle.AddEdge(edgeC);
 
-                edgeA.addTriangle(triangle);
-                edgeB.addTriangle(triangle);
-                edgeC.addTriangle(triangle);
+                edgeA.AddTriangle(triangle);
+                edgeB.AddTriangle(triangle);
+                edgeC.AddTriangle(triangle);
 
                 this.triangles[i] = triangle;
                 i++;
@@ -230,15 +225,14 @@ namespace NetTopologySuite.Hull
 
 
             // add triangle neighbourood
-
             foreach (Edge edge in this.edges.Values)
             {
-                if (edge.getTriangles().Count != 1)
+                if (edge.Triangles.Count != 1)
                 {
-                    OsmPolygon.Concave.Triangle tA = edge.getTriangles()[0];
-                    OsmPolygon.Concave.Triangle tB = edge.getTriangles()[1];
-                    tA.addNeighbour(tB);
-                    tB.addNeighbour(tA);
+                    OsmPolygon.Concave.Triangle tA = edge.Triangles[0];
+                    OsmPolygon.Concave.Triangle tB = edge.Triangles[1];
+                    tA.AddNeighbour(tB);
+                    tB.AddNeighbour(tA);
                 }
             }
 
@@ -258,7 +252,7 @@ namespace NetTopologySuite.Hull
                     KeyValuePair<int, Edge> entry = this.lengths.First();
 
                     int ind = entry.Key;
-                    if (entry.Value.getGeometry().Length > this.threshold)
+                    if (entry.Value.Geometry.Length > this.threshold)
                     {
                         index = ind;
                         e = entry.Value;
@@ -268,155 +262,155 @@ namespace NetTopologySuite.Hull
 
                 if (index != -1)
                 {
-                    OsmPolygon.Concave.Triangle triangle = e.getTriangles()[0];
-                    List<OsmPolygon.Concave.Triangle> neighbours = triangle.getNeighbours();
+                    OsmPolygon.Concave.Triangle triangle = e.Triangles[0];
+                    List<OsmPolygon.Concave.Triangle> neighbours = triangle.Neighbours;
 
                     // irregular triangle test
                     if (neighbours.Count == 1)
                     {
-                        this.shortLengths[e.getId()] = e;
-                        this.lengths.Remove(e.getId());
+                        this.shortLengths[e.Id] = e;
+                        this.lengths.Remove(e.Id);
                     }
                     else
                     {
-                        Edge e0 = triangle.getEdges()[0];
-                        Edge e1 = triangle.getEdges()[1];
+                        Edge e0 = triangle.Edges[0];
+                        Edge e1 = triangle.Edges[1];
 
                         // test if all the vertices are on the border
-                        if (e0.getOV().IsBorder && e0.getEV().IsBorder
-                            && e1.getOV().IsBorder && e1.getEV().IsBorder)
+                        if (e0.OV.IsBorder && e0.EV.IsBorder
+                            && e1.OV.IsBorder && e1.EV.IsBorder)
                         {
-                            this.shortLengths[e.getId()] = e;
-                            this.lengths.Remove(e.getId());
+                            this.shortLengths[e.Id] = e;
+                            this.lengths.Remove(e.Id);
                         }
                         else
                         {
                             // management of triangles
                             OsmPolygon.Concave.Triangle tA = neighbours[0];
                             OsmPolygon.Concave.Triangle tB = neighbours[1];
-                            tA.setBorder(true); // FIXME not necessarily useful
-                            tB.setBorder(true); // FIXME not necessarily useful
-                            this.triangles.Remove(triangle.getId());
-                            tA.removeNeighbour(triangle);
-                            tB.removeNeighbour(triangle);
-
+                            tA.Border = true; // FIXME not necessarily useful
+                            tB.Border = true; // FIXME not necessarily useful
+                            this.triangles.Remove(triangle.Id);
+                            tA.RemoveNeighbour(triangle);
+                            tB.RemoveNeighbour(triangle);
+                            
                             // new edges
-                            List<Edge> ee = triangle.getEdges();
+                            List<Edge> ee = triangle.Edges;
                             Edge eA = ee[0];
                             Edge eB = ee[1];
                             Edge eC = ee[2];
 
-                            if (eA.isBorder())
+                            if (eA.Border)
                             {
-                                this.edges.Remove(eA.getId());
-                                eB.setBorder(true);
+                                this.edges.Remove(eA.Id);
+                                eB.Border = true;
 
-                                eB.getOV().IsBorder = true;
-                                eB.getEV().IsBorder = true;
+                                eB.OV.IsBorder = true;
+                                eB.EV.IsBorder = true;
                                 
-                                eC.setBorder(true);
+                                eC.Border = true;
 
-                                eC.getOV().IsBorder = true;
-                                eC.getEV().IsBorder = true;
+                                eC.OV.IsBorder = true;
+                                eC.EV.IsBorder = true;
 
                                 // clean the relationships with the triangle
-                                eB.removeTriangle(triangle);
-                                eC.removeTriangle(triangle);
+                                eB.RemoveTriangle(triangle);
+                                eC.RemoveTriangle(triangle);
 
-                                if (eB.getGeometry().Length < this.threshold)
+                                if (eB.Geometry.Length < this.threshold)
                                 {
-                                    this.shortLengths[eB.getId()] = eB;
+                                    this.shortLengths[eB.Id] = eB;
                                 }
                                 else
                                 {
-                                    this.lengths[eB.getId()] = eB;
+                                    this.lengths[eB.Id] = eB;
                                 }
 
-                                if (eC.getGeometry().Length < this.threshold)
+                                if (eC.Geometry.Length < this.threshold)
                                 {
-                                    this.shortLengths[eC.getId()] = eC;
+                                    this.shortLengths[eC.Id] = eC;
                                 }
                                 else
                                 {
-                                    this.lengths[eC.getId()] = eC;
+                                    this.lengths[eC.Id] = eC;
                                 }
 
-                                this.lengths.Remove(eA.getId());
-                            } // End if (eA.isBorder()) 
-                            else if (eB.isBorder())
+                                this.lengths.Remove(eA.Id);
+                            } // End if (eA.Border) 
+                            else if (eB.Border)
                             {
-                                this.edges.Remove(eB.getId());
-                                eA.setBorder(true);
-                                eA.getOV().IsBorder = true;
-                                eA.getEV().IsBorder = true;
-                                eC.setBorder(true);
-                                eC.getOV().IsBorder = true;
-                                eC.getEV().IsBorder = true;
+                                this.edges.Remove(eB.Id);
+                                eA.Border = true;
+                                eA.OV.IsBorder = true;
+                                eA.EV.IsBorder = true;
+                                eC.Border = true;
+                                eC.OV.IsBorder = true;
+                                eC.EV.IsBorder = true;
 
                                 // clean the relationships with the triangle
-                                eA.removeTriangle(triangle);
-                                eC.removeTriangle(triangle);
+                                eA.RemoveTriangle(triangle);
+                                eC.RemoveTriangle(triangle);
 
-                                if (eA.getGeometry().Length < this.threshold)
+                                if (eA.Geometry.Length < this.threshold)
                                 {
-                                    this.shortLengths[eA.getId()] = eA;
+                                    this.shortLengths[eA.Id] = eA;
                                 }
                                 else
                                 {
-                                    this.lengths[eA.getId()] = eA;
+                                    this.lengths[eA.Id] = eA;
                                 }
-                                if (eC.getGeometry().Length < this.threshold)
+                                if (eC.Geometry.Length < this.threshold)
                                 {
-                                    this.shortLengths[eC.getId()] = eC;
+                                    this.shortLengths[eC.Id] = eC;
                                 }
                                 else
                                 {
-                                    this.lengths[eC.getId()] = eC;
+                                    this.lengths[eC.Id] = eC;
                                 }
 
-                                this.lengths.Remove(eB.getId());
+                                this.lengths.Remove(eB.Id);
 
-                            } // End else if (eB.isBorder())
+                            } // End else if (eB.Border)
                             else
                             {
-                                this.edges.Remove(eC.getId());
-                                eA.setBorder(true);
+                                this.edges.Remove(eC.Id);
+                                eA.Border = true; 
 
-                                eA.getOV().IsBorder = true;
-                                eA.getEV().IsBorder = true;
-                                eB.setBorder(true);
-                                eB.getOV().IsBorder = true;
-                                eB.getEV().IsBorder = true;
+                                eA.OV.IsBorder = true;
+                                eA.EV.IsBorder = true;
+                                eB.Border = true;
+                                eB.OV.IsBorder = true;
+                                eB.EV.IsBorder = true;
                                 
                                 // clean the relationships with the triangle
-                                eA.removeTriangle(triangle);
-                                eB.removeTriangle(triangle);
+                                eA.RemoveTriangle(triangle);
+                                eB.RemoveTriangle(triangle);
 
-                                if (eA.getGeometry().Length < this.threshold)
+                                if (eA.Geometry.Length < this.threshold)
                                 {
-                                    this.shortLengths[eA.getId()] = eA;
+                                    this.shortLengths[eA.Id] = eA;
                                 }
                                 else
                                 {
-                                    this.lengths[eA.getId()] = eA;
+                                    this.lengths[eA.Id] = eA;
                                 }
 
-                                if (eB.getGeometry().Length < this.threshold)
+                                if (eB.Geometry.Length < this.threshold)
                                 {
-                                    this.shortLengths[eB.getId()] = eB;
+                                    this.shortLengths[eB.Id] = eB;
                                 }
                                 else
                                 {
-                                    this.lengths[eB.getId()] = eB;
+                                    this.lengths[eB.Id] = eB;
                                 }
 
-                                this.lengths.Remove(eC.getId());
-                            } // End else of if (e0.getOV().IsBorder && e0.getEV().IsBorder && e1.getOV().IsBorder && e1.getEV().IsBorder)
-
+                                this.lengths.Remove(eC.Id);
+                            } // End Else of if (e0.OV.Border && e0.EV.Border && e1.OV.Border && e1.EV.Border)
+                            
                         } // End Else of if 
-
-                    } // End else of if (neighbours.Count == 1)
-
+                        
+                    } // End Else of if (neighbours.Count == 1)
+                    
                 } // End if (index != -1) 
 
             } // Whend 
@@ -425,56 +419,49 @@ namespace NetTopologySuite.Hull
             List<LineString> edges = new List<LineString>();
             foreach (Edge e in this.lengths.Values)
             {
-                LineString l = e.getGeometry().ToGeometry(this.geomFactory);
+                LineString l = e.Geometry.ToGeometry(this.geomFactory);
                 edges.Add(l);
             }
 
             foreach (Edge e in this.shortLengths.Values)
             {
-                LineString l = e.getGeometry().ToGeometry(this.geomFactory);
+                LineString l = e.Geometry.ToGeometry(this.geomFactory);
                 edges.Add(l);
             }
 
             // merge
-            LineMerger lineMerger = new LineMerger();
+            NetTopologySuite.Operation.Linemerge.LineMerger lineMerger = new NetTopologySuite.Operation.Linemerge.LineMerger();
             lineMerger.Add(edges);
-
-
-
-            IEnumerator<Geometry> en = lineMerger.GetMergedLineStrings().GetEnumerator();
-            en.MoveNext();
-
-            LineString merge = (LineString)en.Current;
-
-
+            
+            LineString merge = null;
+            
+            using (IEnumerator<Geometry> en = lineMerger.GetMergedLineStrings().GetEnumerator())
+            {
+                en.MoveNext();
+                merge = (LineString)en.Current;
+            }
+            
             if (merge.IsRing)
             {
                 LinearRing lr = new LinearRing(merge.CoordinateSequence, this.geomFactory);
                 Polygon concaveHull = new Polygon(lr, null, this.geomFactory);
                 return concaveHull;
             }
-
+            
             return merge;
         }
-
-
-        private static IList<QuadEdgeTriangle> ExtractTriangles(QuadEdgeSubdivision subdiv)
-        {
-            var qeTris = QuadEdgeTriangle.CreateOn(subdiv);
-            return qeTris;
-        }
-
-
+        
+        
         private QuadEdgeSubdivision BuildDelaunay()
         {
-            var builder = new DelaunayTriangulationBuilder();
+            DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
             builder.SetSites(this.geometries);
-            var subDiv = builder.GetSubdivision();
+            QuadEdgeSubdivision subDiv = builder.GetSubdivision();
             return subDiv;
         }
-
-
+        
+        
     }
-
-
+    
+    
 }

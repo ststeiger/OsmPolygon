@@ -26,261 +26,162 @@ namespace OsmPolygon.Concave
 {
 	using System.Collections.Generic;
 
-	/**
-	 * Triangle.
-	 * 
-	 * @author Eric Grosso
-	 *
-	 */
+	// Triangle. @author Eric Grosso
 	public class Triangle
 	{
 
-		/** ID of the triangle */
+		// ID of the triangle
 		private int id;
 
-		/** Indicator to know if the triangle is a border triangle
-		 * of the triangulation framework */
+		// Indicator to know if the triangle is a border triangle
+		// of the triangulation framework 
 		private bool border;
 
-		/** Edges which compose the triangle */
+		// Edges which compose the triangle
 		private List<Edge> edges = new System.Collections.Generic.List<Edge>();
 
-		/** Neighbour triangles of this triangle */
+		// Neighbour triangles of this triangle
 		private List<Triangle> neighbours = new System.Collections.Generic.List<Triangle>();
 
 		// vertices...
-
-		/**
-		 * Default constructor.
-		 */
+		
+		
+		// Default constructor.
 		public Triangle()
-		{
-			//
-		}
+		{ }
 
-		/**
-		 * Constructor.
-		 * 
-		 * @param id
-		 * 		ID of the triangle
-		 */
+		// Constructor.
+		// @param id ID of the triangle
 		public Triangle(int id)
 		{
 			this.id = id;
 		}
 
-		/**
-		 * Constructor.
-		 * 
-		 * @param id
-		 * 		ID of the triangle
-		 * @param border
-		 * 		defines if the triangle is a border triangle
-		 * 		or not in the triangulation framework
-		 */
+		// Constructor.
+		// @param id ID of the triangle
+		// @param border defines if the triangle is a border triangle or not in the triangulation framework 
 		public Triangle(int id, bool border)
 		{
 			this.id = id;
 			this.border = border;
 		}
 
-		/**
-		 * Returns the ID of the triangle.
-		 * 
-		 * @return
-		 * 		the ID of the triangle
-		 */
-		public int getId()
+		// Defines/Returns the ID of the triangle.
+		// @param id ID of the triangle
+		public int Id
 		{
-			return this.id;
+			get{ return this.id; }
+			set{ this.id = value; }	
 		}
-
-		/**
-		 * Defines the ID of the triangle.
-		 * 
-		 * @param id
-		 * 		ID of the triangle
-		 */
-		public void setId(int id)
+		
+		
+		// Returns/Defines the indicator to know if the triangle
+		// is a border triangle of the triangulation framework.
+		// @param border
+		// true if the triangle is a border triangle,
+		// false otherwise
+		public bool Border
 		{
-			this.id = id;
+			get { return this.border; }
+			set { this.border = value; }
 		}
-
-		/**
-		 * Returns true if the triangle is a border triangle
-		 * of the triangulation framework, false otherwise.
-		 * 
-		 * @return
-		 * 		true if the triangle is a border triangle,
-		 * 		false otherwise
-		 */
-		public bool isBorder()
+		
+		
+		// Defines/Returns the edges which compose the triangle.
+		// @return the edges which compose the triangle
+		public List<Edge> Edges
 		{
-			return this.border;
+			get { return this.edges; }
+			set { this.edges = value; }
 		}
-
-		/**
-		 * Defines the indicator to know if the triangle
-		 * is a border triangle of the triangulation framework.
-		 * 
-		 * @param border
-		 * 		true if the triangle is a border triangle,
-		 * 		false otherwise
-		 */
-		public void setBorder(bool border)
+		
+		
+		// Defines/Returns the neighbour triangles of the triangle.
+		// @return the neighbour triangles of the triangle
+		public List<Triangle> Neighbours
 		{
-			this.border = border;
-		}
-
-		/**
-		 * Returns the edges which compose the triangle.
-		 * 
-		 * @return
-		 * 		the edges of the triangle which compose the triangle
-		 */
-		public List<Edge> getEdges()
-		{
-			return this.edges;
-		}
-
-		/**
-		 * Defines the edges which compose the triangle.
-		 * 
-		 * @param edges
-		 * 		the edges which compose the triangle
-		 */
-		public void setEdges(List<Edge> edges)
-		{
-			this.edges = edges;
-		}
-
-		/**
-		 * Returns the neighbour triangles of the triangle.
-		 * 
-		 * @return
-		 * 		the neighbour triangles of the triangle
-		 */
-		public List<Triangle> getNeighbours()
-		{
-			return this.neighbours;
-		}
-
-		/**
-		 * Defines the neighbour triangles of the triangle.
-		 * 
-		 * @param neighbours
-		 * 		the neighbour triangles of the triangle
-		 */
-		public void setNeighbours(List<Triangle> neighbours)
-		{
-			this.neighbours = neighbours;
-		}
-
-
-		/**
-		 * Add an edge to the triangle.
-		 * 
-		 * @return
-		 * 		true if added, false otherwise
-		 */
-		public bool addEdge(Edge edge)
-		{
-			getEdges().Add(edge);
-			return true;
-		}
-
-		/**
-		 * Add edges to the triangle.
-		 * 
-		 * @return
-		 * 		true if added, false otherwise
-		 */
-		public bool addEdges(List<Edge> edges)
-		{
-			getEdges().AddRange(edges);
-			return true;
-		}
-
-		/**
-		 * Remove an edge of the triangle.
-		 * 
-		 * @return
-		 * 		true if removed, false otherwise
-		 */
-		public bool removeEdge(Edge edge)
-		{
-			return getEdges().Remove(edge);
-		}
-
-		/**
-		 * Remove edges of the triangle.
-		 * 
-		 * @return
-		 * 		true if removed, false otherwise
-		 */
-		public bool removeEdges(List<Edge> edges)
-		{
-			var x = getEdges();
-
-			foreach (var thisEdge in x)
+			get
 			{
-				x.Remove(thisEdge);
+				return this.neighbours;
 			}
-
-			return true;
-		}
-
-
-		/**
-		 * Add a neighbour triangle to the triangle.
-		 * 
-		 * @return
-		 * 		true if added, false otherwise
-		 */
-		public bool addNeighbour(Triangle triangle)
-		{
-			getNeighbours().Add(triangle);
-			return true;
-		}
-
-		/**
-		 * Add neighbour triangles to the triangle.
-		 * 
-		 * @return
-		 * 		true if added, false otherwise
-		 */
-		public bool addNeighbours(List<Triangle> triangles)
-		{
-			getNeighbours().AddRange(triangles);
-			return true;
-		}
-
-		/**
-		 * Remove a neighbour triangle of the triangle.
-		 * 
-		 * @return
-		 * 		true if removed, false otherwise
-		 */
-		public bool removeNeighbour(Triangle triangle)
-		{
-			return getNeighbours().Remove(triangle);
-		}
-
-		/**
-		 * Remove neighbour triangles of the triangle.
-		 * 
-		 * @return
-		 * 		true if removed, false otherwise
-		 */
-		public bool removeNeighbours(List<Triangle> triangles)
-		{
-			var neighbours = getNeighbours();
-
-			foreach (var t in triangles)
+			set
 			{
-				neighbours.Remove(t);
+				this.neighbours = value;
 			}
+		}
+		
+		
+		// Add an edge to the triangle.
+		// @return true if added, false otherwise 
+		public bool AddEdge(Edge edge)
+		{
+			this.edges.Add(edge);
+			return true;
+		}
 
+		// Add edges to the triangle.
+		// @return true if added, false otherwise
+		public bool AddEdges(List<Edge> edges)
+		{
+			this.edges.AddRange(edges);
+			return true;
+		}
+
+		// Remove an edge of the triangle.
+		// @return true if removed, false otherwise
+		public bool RemoveEdge(Edge edge)
+		{
+			return this.edges.Remove(edge);
+		}
+		
+		
+		// Remove edges of the triangle.
+		// @return true if removed, false otherwise
+		public bool RemoveEdges(List<Edge> edgesToRemove)
+		{
+			foreach (Edge thisEdge in edgesToRemove)
+			{
+				this.edges.Remove(thisEdge);
+			}
+			
+			return true;
+		}
+
+
+		// Add a neighbour triangle to the triangle.
+		// @return true if added, false otherwise
+		public bool AddNeighbour(Triangle triangle)
+		{
+			this.neighbours.Add(triangle);
+			return true;
+		}
+		
+		
+		// Add neighbour triangles to the triangle.
+		// @return true if added, false otherwise
+		public bool AddNeighbours(List<Triangle> triangles)
+		{
+			this.neighbours.AddRange(triangles);
+			return true;
+		}
+		
+		
+		// Remove a neighbour triangle of the triangle.
+		// @return true if removed, false otherwise
+		public bool RemoveNeighbour(Triangle triangle)
+		{
+			return this.neighbours.Remove(triangle);
+		}
+
+		// Remove neighbour triangles of the triangle.
+		// @return true if removed, false otherwise
+		public bool RemoveNeighbours(List<Triangle> triangles)
+		{
+			foreach (Triangle t in triangles)
+			{
+				this.neighbours.Remove(t);
+			}
+			
 			return true;
 		}
 
