@@ -24,7 +24,13 @@ namespace NetTopologySuite.Triangulate.QuadEdge
     /// <author>David Skea</author>
     /// <author>Martin Davis</author>
     public class QuadEdge
+        : System.IComparable<QuadEdge>
     {
+
+
+
+
+
         /// <summary>
         /// Creates a new QuadEdge quartet from <see cref="Vertex"/>o to <see cref="Vertex"/> d.
         /// </summary>
@@ -346,6 +352,11 @@ namespace NetTopologySuite.Triangulate.QuadEdge
             var p0 = _vertex.Coordinate;
             var p1 = Dest.Coordinate;
             return WKTWriter.ToLineString(p0, p1);
+        }
+
+        public int CompareTo(QuadEdge other)
+        {
+            return this.Length.CompareTo(other.Length);
         }
     }
 }

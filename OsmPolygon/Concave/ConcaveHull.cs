@@ -52,7 +52,7 @@ namespace NetTopologySuite.Hull
 
         private static GeometryCollection transformIntoPointGeometryCollection(Geometry geom)
         {
-            NetTopologySuite.Utilities.UniqueCoordinateArrayFilter filter = new NetTopologySuite.Utilities.UniqueCoordinateArrayFilter();
+            Utilities.UniqueCoordinateArrayFilter filter = new Utilities.UniqueCoordinateArrayFilter();
             geom.Apply(filter);
             Coordinate[] coord = filter.Coordinates;
 
@@ -72,7 +72,7 @@ namespace NetTopologySuite.Hull
 	    // @return a geometry collection
         private static GeometryCollection transformIntoPointGeometryCollection(GeometryCollection gc)
         {
-            NetTopologySuite.Utilities.UniqueCoordinateArrayFilter filter = new NetTopologySuite.Utilities.UniqueCoordinateArrayFilter();
+            Utilities.UniqueCoordinateArrayFilter filter = new Utilities.UniqueCoordinateArrayFilter();
             gc.Apply(filter);
             Coordinate[] coord = filter.Coordinates;
 
@@ -88,9 +88,46 @@ namespace NetTopologySuite.Hull
         }
 
 
-        public Geometry GetResult()
+
+        // Returns a {@link Geometry} that represents the concave hull of the input
+        // geometry according to the threshold.
+        // The returned geometry contains the minimal number of points needed to
+        // represent the concave hull.
+        //
+        // @return if the concave hull contains 3 or more points, a {@link Polygon};
+        // 2 points, a {@link LineString};
+        // 1 point, a {@link Point};
+        // 0 points, an empty {@link GeometryCollection}.
+
+        public Geometry GetConcaveHull
         {
-            QuadEdgeSubdivision qes = BuildDelaunay();
+            get{
+                if (this.geometries.NumGeometries == 0)
+                {
+                    return this.geomFactory.CreateGeometryCollection(null);
+                }
+
+                if (this.geometries.NumGeometries == 1)
+                {
+                    return this.geometries.GetGeometryN(0);
+                }
+
+                if (this.geometries.NumGeometries == 2)
+                {
+                    return this.geomFactory.CreateLineString(this.geometries.Coordinates);
+                }
+
+                return ComputeConcaveHull();
+            }
+        }
+
+
+        public Geometry ComputeConcaveHull()
+        {
+            ConformingDelaunayTriangulationBuilder cdtb = new ConformingDelaunayTriangulationBuilder();
+            cdtb.SetSites(this.geometries);
+
+            QuadEdgeSubdivision qes = cdtb.GetSubdivision();
             IList<QuadEdge> quadEdges = qes.GetEdges();
             IList<QuadEdgeTriangle> qeTriangles = QuadEdgeTriangle.CreateOn(qes);
             IEnumerable<Vertex> qeVertices = qes.GetVertices(false);
@@ -107,6 +144,7 @@ namespace NetTopologySuite.Hull
             List<QuadEdge> qeFrame = new List<QuadEdge>();
             List<QuadEdge> qeBorder = new List<QuadEdge>();
             
+            // here each one more
             foreach (QuadEdge qe in quadEdges)
             {
                 if (qes.IsFrameBorderEdge(qe))
@@ -144,18 +182,31 @@ namespace NetTopologySuite.Hull
                 qeDistances[qe] = qe.ToLineSegment().Length;
             }
 
-            QuadEdgeComparer dc = new QuadEdgeComparer();
-            //SortedDictionary<QuadEdge, double> qeSorted = new SortedDictionary<QuadEdge, double>(qeDistances, dc);
-            SortedDictionary<QuadEdge, double> qeSorted = new SortedDictionary<QuadEdge, double>(dc);
-            foreach (KeyValuePair<QuadEdge, double> thisDistance in qeDistances)
-            {
-                // qeSorted.Add(x.Key, x.Value);
-                qeSorted[thisDistance.Key] = thisDistance.Value;
-            }
+            
+            DoubleComparator dc = new DoubleComparator(qeDistances);
+
+
+            
+
+
+            // SortedDictionary<QuadEdge, double> qeSorted = new SortedDictionary<QuadEdge, double>(qeDistances, dc);
+            // SortedDictionary<QuadEdge, double> qeSorted = new SortedDictionary<QuadEdge, double>(dc);
+
+            TreeMap.TreeMap<QuadEdge, double> qeSorted = new TreeMap.TreeMap<QuadEdge, double>(dc);
+            qeSorted.PutAll(qeDistances);
+
+
+            //foreach (KeyValuePair<QuadEdge, double> thisDistance in qeDistances)
+            //{
+            //    // qeSorted.Add(x.Key, x.Value);
+            //    qeSorted[thisDistance.Key] = thisDistance.Value;
+            //}
+            
+            
             
             // edges creation
             int i = 0;
-            foreach (QuadEdge qe in qeSorted.Keys)
+            foreach (QuadEdge qe in qeSorted.Keys())
             {
                 LineSegment s = qe.ToLineSegment();
                 s.Normalize();
@@ -430,7 +481,7 @@ namespace NetTopologySuite.Hull
             }
 
             // merge
-            NetTopologySuite.Operation.Linemerge.LineMerger lineMerger = new NetTopologySuite.Operation.Linemerge.LineMerger();
+            Operation.Linemerge.LineMerger lineMerger = new Operation.Linemerge.LineMerger();
             lineMerger.Add(edges);
             
             LineString merge = null;
@@ -449,15 +500,6 @@ namespace NetTopologySuite.Hull
             }
             
             return merge;
-        }
-        
-        
-        private QuadEdgeSubdivision BuildDelaunay()
-        {
-            DelaunayTriangulationBuilder builder = new DelaunayTriangulationBuilder();
-            builder.SetSites(this.geometries);
-            QuadEdgeSubdivision subDiv = builder.GetSubdivision();
-            return subDiv;
         }
         
         
