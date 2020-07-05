@@ -22,9 +22,11 @@
  * Eric Grosso, eric.grosso.os@gmail.com
  * 
  */
-namespace OsmPolygon.Concave
+namespace NetTopologySuite.Hull
 {
+
 	using System.Collections.Generic;
+
 
 	// Triangle. @author Eric Grosso
 	public class Triangle

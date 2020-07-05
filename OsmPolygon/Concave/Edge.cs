@@ -3,7 +3,7 @@ using NetTopologySuite.Triangulate.QuadEdge;
 using System.Collections.Generic;
 
 
-namespace OsmPolygon.Concave
+namespace NetTopologySuite.Hull
 {
     /*
  * This file is part of the OpenSphere project which aims to

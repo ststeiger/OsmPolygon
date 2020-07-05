@@ -6,7 +6,7 @@ using NetTopologySuite.Geometries;
 using NetTopologySuite.Geometries.Implementation;
 using NetTopologySuite.Triangulate;
 using NetTopologySuite.Triangulate.QuadEdge;
-using OsmPolygon.Concave;
+
 
 namespace NetTopologySuite.Hull
 {
@@ -25,7 +25,7 @@ namespace NetTopologySuite.Hull
         
         public Dictionary<LineSegment, int> segments = new Dictionary<LineSegment, int>();
         public Dictionary<int, Edge> edges = new Dictionary<int, Edge>();
-        public Dictionary<int, OsmPolygon.Concave.Triangle> triangles = new Dictionary<int, OsmPolygon.Concave.Triangle>();
+        public Dictionary<int, Triangle> triangles = new Dictionary<int, Triangle>();
         public SortedDictionary<int, Edge> lengths = new SortedDictionary<int, Edge>();
 
         public Dictionary<int, Edge> shortLengths = new Dictionary<int, Edge>();
@@ -210,7 +210,7 @@ namespace NetTopologySuite.Hull
                 Edge edgeB = this.edges[this.segments[sB]];
                 Edge edgeC = this.edges[this.segments[sC]];
 
-                OsmPolygon.Concave.Triangle triangle = new OsmPolygon.Concave.Triangle(i, qet.IsBorder() ? true : false);
+                Triangle triangle = new Triangle(i, qet.IsBorder() ? true : false);
                 triangle.AddEdge(edgeA);
                 triangle.AddEdge(edgeB);
                 triangle.AddEdge(edgeC);
@@ -229,8 +229,8 @@ namespace NetTopologySuite.Hull
             {
                 if (edge.Triangles.Count != 1)
                 {
-                    OsmPolygon.Concave.Triangle tA = edge.Triangles[0];
-                    OsmPolygon.Concave.Triangle tB = edge.Triangles[1];
+                    Triangle tA = edge.Triangles[0];
+                    Triangle tB = edge.Triangles[1];
                     tA.AddNeighbour(tB);
                     tB.AddNeighbour(tA);
                 }
@@ -262,8 +262,8 @@ namespace NetTopologySuite.Hull
 
                 if (index != -1)
                 {
-                    OsmPolygon.Concave.Triangle triangle = e.Triangles[0];
-                    List<OsmPolygon.Concave.Triangle> neighbours = triangle.Neighbours;
+                    Triangle triangle = e.Triangles[0];
+                    List<Triangle> neighbours = triangle.Neighbours;
 
                     // irregular triangle test
                     if (neighbours.Count == 1)
@@ -286,8 +286,8 @@ namespace NetTopologySuite.Hull
                         else
                         {
                             // management of triangles
-                            OsmPolygon.Concave.Triangle tA = neighbours[0];
-                            OsmPolygon.Concave.Triangle tB = neighbours[1];
+                            Triangle tA = neighbours[0];
+                            Triangle tB = neighbours[1];
                             tA.Border = true; // FIXME not necessarily useful
                             tB.Border = true; // FIXME not necessarily useful
                             this.triangles.Remove(triangle.Id);
