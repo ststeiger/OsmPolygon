@@ -176,18 +176,16 @@ namespace NetTopologySuite.Hull
             }
 
 
+
             Dictionary<QuadEdge, double> qeDistances = new Dictionary<QuadEdge, double>();
+            
             foreach (QuadEdge qe in quadEdges)
             {
-                qeDistances[qe] = qe.ToLineSegment().Length;
+                qeDistances.Add(qe, qe.ToLineSegment().Length);
             }
 
             
             DoubleComparator dc = new DoubleComparator(qeDistances);
-
-
-            
-
 
             // SortedDictionary<QuadEdge, double> qeSorted = new SortedDictionary<QuadEdge, double>(qeDistances, dc);
             // SortedDictionary<QuadEdge, double> qeSorted = new SortedDictionary<QuadEdge, double>(dc);
