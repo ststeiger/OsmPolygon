@@ -128,6 +128,7 @@ namespace NetTopologySuite.Hull
             cdtb.SetSites(this.geometries);
 
             QuadEdgeSubdivision qes = cdtb.GetSubdivision();
+
             IList<QuadEdge> quadEdges = qes.GetEdges();
             IList<QuadEdgeTriangle> qeTriangles = QuadEdgeTriangle.CreateOn(qes);
             IEnumerable<Vertex> qeVertices = qes.GetVertices(false);
@@ -186,27 +187,20 @@ namespace NetTopologySuite.Hull
 
             
             DoubleComparator dc = new DoubleComparator(qeDistances);
+            // This doesn't work with dictionary - missing duplicates ...
+            List<KeyValuePair<QuadEdge, double>> qeSorted = new List<KeyValuePair<QuadEdge, double>>();
+            foreach (KeyValuePair<QuadEdge, double> thisDistance in qeDistances)
+            {
+                qeSorted.Add(thisDistance);
+            }
+            qeSorted.Sort(dc);
 
-            // SortedDictionary<QuadEdge, double> qeSorted = new SortedDictionary<QuadEdge, double>(qeDistances, dc);
-            // SortedDictionary<QuadEdge, double> qeSorted = new SortedDictionary<QuadEdge, double>(dc);
 
-            TreeMap.TreeMap<QuadEdge, double> qeSorted = new TreeMap.TreeMap<QuadEdge, double>(dc);
-            qeSorted.PutAll(qeDistances);
-
-
-            //foreach (KeyValuePair<QuadEdge, double> thisDistance in qeDistances)
-            //{
-            //    // qeSorted.Add(x.Key, x.Value);
-            //    qeSorted[thisDistance.Key] = thisDistance.Value;
-            //}
-            
-            
-            
             // edges creation
             int i = 0;
-            foreach (QuadEdge qe in qeSorted.Keys())
+            foreach (KeyValuePair<QuadEdge, double> kvp in qeSorted)
             {
-                LineSegment s = qe.ToLineSegment();
+                LineSegment s = kvp.Key.ToLineSegment();
                 s.Normalize();
 
                 int idS = this.coordinates[s.P0];
@@ -215,7 +209,7 @@ namespace NetTopologySuite.Hull
                 Vertex eV = this.vertices[idD];
 
                 Edge edge;
-                if (qeBorder.Contains(qe))
+                if (qeBorder.Contains(kvp.Key))
                 {
                     oV.IsBorder = true;
                     eV.IsBorder = true;

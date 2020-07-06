@@ -1,5 +1,4 @@
-﻿
-/*
+﻿/*
 * This file is part of the OpenSphere project which aims to
 * develop geospatial algorithms.
 * 
@@ -25,21 +24,24 @@
 */
 
 
-using NetTopologySuite.Triangulate.QuadEdge;
 using System.Collections.Generic;
+using NetTopologySuite.Triangulate.QuadEdge;
+
 
 namespace NetTopologySuite.Hull
 {
 
 
+
     // Comparator of a map containing QuadEdge as key
     // and Double as value (Double comparator).
     // @author Eric Grosso
-    public class DoubleComparator
-        : Comparer<QuadEdge>
+    // modified for use in C# List Stefan Steiger 
+    internal class DoubleComparator 
+        : IComparer<KeyValuePair<QuadEdge, double>>
     {
-
         Dictionary<QuadEdge, double> map;
+
 
         // Constructor.
         // @param map map containing QuadEdge and Double
@@ -48,28 +50,27 @@ namespace NetTopologySuite.Hull
             this.map = map;
         }
 
-        /**
-		 * Method of comparison.
-		 * 
-		 * @param qeA
-		 * 		quad edge to compare
-		 * @param qeB
-		 * 		quad edge to compare
-		 * @return
-		 * 		1 if double value associated to qeA  < double
-		 * 		value associated to qeB,
-		 * 		0 if values are equals,
-		 * 		-1 otherwise
-		 */
-        public override int Compare(QuadEdge qeA, QuadEdge qeB)
+
+        // Method of comparison.
+        // @param qeA quad edge to compare
+        // @param qeB quad edge to compare
+        // @return
+        // 		1 if double value associated to qeA  < double
+        // 		value associated to qeB,
+        // 		0 if values are equals,
+        // 		-1 otherwise
+        public int Compare(KeyValuePair<QuadEdge, double> qeA, KeyValuePair<QuadEdge, double> qeB)
         {
-            if (this.map[qeA] < this.map[qeB])
+            var a = this.map[qeA.Key];
+
+            if (this.map[qeA.Key] < this.map[qeB.Key])
                 return 1;
-            else if (this.map[qeA] == this.map[qeB])
+            else if (this.map[qeA.Key] == this.map[qeB.Key])
                 return 0;
 
             return -1;
         }
+
 
     }
 
