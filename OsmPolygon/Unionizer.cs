@@ -45,6 +45,8 @@ namespace OsmPolygon
             System.Collections.Generic.List<System.Collections.Generic.List<OSM.API.v0_6.GeoPoint>> ls =
                 Newtonsoft.Json.JsonConvert.DeserializeObject<System.Collections.Generic.List<System.Collections.Generic.List<OSM.API.v0_6.GeoPoint>>>(a);
 
+
+            ls = FineGrainedHullPoints(ls, 100);
             System.Collections.Generic.List<OSM.API.v0_6.GeoPoint> lsUnionPolygonPoints = GetUnionPolygon(ls);
 
             // System.Collections.Generic.List<OSM.API.v0_6.GeoPoint> lsUnionPolygonPoints =
@@ -56,6 +58,51 @@ namespace OsmPolygon
             System.Console.WriteLine(insertString);
         }
         // http://www.rotefabrik.free.fr/concave_hull/
+
+
+        public static System.Collections.Generic.List<System.Collections.Generic.List<OSM.API.v0_6.GeoPoint>> FineGrainedHullPoints(
+            System.Collections.Generic.List<System.Collections.Generic.List<OSM.API.v0_6.GeoPoint>> ls, int numPointsOnLine
+            )
+        {
+            System.Collections.Generic.List<System.Collections.Generic.List<OSM.API.v0_6.GeoPoint>> ls2 = new System.Collections.Generic.List<System.Collections.Generic.List<OSM.API.v0_6.GeoPoint>>();
+
+            foreach (System.Collections.Generic.List<OSM.API.v0_6.GeoPoint> thisList in ls)
+            {
+
+                System.Collections.Generic.List<OSM.API.v0_6.GeoPoint> newList =
+                    new System.Collections.Generic.List<OSM.API.v0_6.GeoPoint>();
+
+                for (int i = 0; i < thisList.Count; ++i)
+                {
+                    OSM.API.v0_6.GeoPoint thisPoint = thisList[i];
+                    newList.Add(thisPoint);
+
+                    if (i < thisList.Count - 1)
+                    {
+                        OSM.API.v0_6.GeoPoint nextPoint = thisList[i + 1];
+
+                        decimal deltaX = nextPoint.Latitude - thisPoint.Latitude;
+                        decimal deltaY = nextPoint.Longitude - thisPoint.Longitude;
+
+                        deltaX = deltaX / numPointsOnLine;
+                        deltaY = deltaY / numPointsOnLine;
+
+                        for (int j = 0; j < numPointsOnLine; ++j)
+                        {
+                            var newPoint = new OSM.API.v0_6.GeoPoint(thisPoint.Latitude + j * deltaX, thisPoint.Longitude + j * deltaY);
+                            newList.Add(newPoint);
+                        }
+                    }
+                }
+
+                ls2.Add(newList);
+
+            }
+
+            return ls2;
+        }
+
+
 
         public static T ReadStream<T>(string fileName)
         {
@@ -110,15 +157,22 @@ namespace OsmPolygon
 
 
 
-            // ig = lalala.ConvexHull();
-            var cc = new NetTopologySuite.Hull.ConcaveHull(ig, 0.00049);
+            // var cc = new NetTopologySuite.Hull.ConcaveHull(ig, 0);
+            // var cc = new NetTopologySuite.Hull.ConcaveHull(ig, 0.00049);
+            var cc = new NetTopologySuite.Hull.ConcaveHull(ig, 0.00001);
             ig = cc.GetConcaveHull;
 
 
 
-
+            ig = NetTopologySuite.Simplify.DouglasPeuckerSimplifier.Simplify(ig, 0.00001);
             NetTopologySuite.Geometries.Polygon unionPolygon = (NetTopologySuite.Geometries.Polygon)ig;
+
+
+            
+
             System.Console.WriteLine(unionPolygon.Shell.Coordinates);
+
+
 
 
             System.Collections.Generic.List<OSM.API.v0_6.GeoPoint> lsUnionPolygonPoints = new System.Collections.Generic.List<OSM.API.v0_6.GeoPoint>();
@@ -194,7 +248,9 @@ namespace OsmPolygon
             if (coords[0].Latitude != coords[coords.Count - 1].Latitude || coords[0].Longitude != coords[coords.Count - 1].Longitude)
                 coords.Add(coords[0]);
 
-            string insertString = @"
+
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            sb.Append(@"
 DECLARE @GB_UID AS uniqueidentifier;
 DECLARE @SO_UID AS uniqueidentifier;
 
@@ -215,28 +271,28 @@ INSERT INTO T_ZO_Objekt_Wgs84Polygon
     ,ZO_OBJ_WGS84_GM_Lat
     ,ZO_OBJ_WGS84_GM_Lng
 )
-";
+");
 
 
             for (int i = 0; i < coords.Count; ++i)
             {
                 if (i != 0)
-                    insertString += " \r\n\r\n\r\nUNION ALL \r\n\r\n";
+                    sb.Append(" \r\n\r\n\r\nUNION ALL \r\n\r\n");
 
 
-
-                insertString += $@"
+                sb.Append($@"
 SELECT
      NEWID() AS ZO_OBJ_WGS84_UID
     ,CAST(@GB_UID AS uniqueidentifier) AS ZO_OBJ_WGS84_GB_UID
     ,CAST(@SO_UID AS uniqueidentifier) AS ZO_OBJ_WGS84_SO_UID
     ,CAST({i.ToString(System.Globalization.CultureInfo.InvariantCulture)} AS integer) + 1 AS ZO_OBJ_WGS84_Sort
     ,{coords[i].Latitude.ToString(System.Globalization.CultureInfo.InvariantCulture)} AS ZO_OBJ_WGS84_GM_Lat -- decimal(23, 20)
-    ,{coords[i].Longitude.ToString(System.Globalization.CultureInfo.InvariantCulture)} AS ZO_OBJ_WGS84_GM_Lng -- decimal(23, 20) ";
+    ,{coords[i].Longitude.ToString(System.Globalization.CultureInfo.InvariantCulture)} AS ZO_OBJ_WGS84_GM_Lng -- decimal(23, 20) ");
             }
 
 
-            insertString += " \r\n; \r\n\r\n";
+            sb.Append(" \r\n; \r\n\r\n");
+            string insertString = sb.ToString();
             return insertString;
         }
 

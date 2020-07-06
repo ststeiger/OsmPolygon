@@ -100,11 +100,11 @@ namespace OsmPolygon
             Unionizer.Test();
 
             // Do it all automatically: 
-            OsmPolyonFinder.GetAndInsertBuildingPolygon();
+            // OsmPolyonFinder.GetAndInsertBuildingPolygon();
             // EsriConverter.ESRI.Test();
             // MoveMe.MoveMe.TestArea();
 
-            CreateImportScriptForPolygonByWayId(args);
+            // CreateImportScriptForPolygonByWayId(args);
 
             // OsmPolygonHelper.Test();
 

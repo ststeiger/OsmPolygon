@@ -12,9 +12,9 @@ namespace NetTopologySuite.Hull
 {
 
 
-    // https://towardsdatascience.com/the-concave-hull-c649795c0f0f
-    // https://github.com/matsim-up/freight-sa/blob/master/src/main/java/org/matsim/up/freight/clustering/containers/ConcaveHull.java
     // http://www.rotefabrik.free.fr/concave_hull/
+    // https://observablehq.com/@mourner/adaptive-concave-hull
+    // https://towardsdatascience.com/the-concave-hull-c649795c0f0f
     public class ConcaveHull
     {
 
