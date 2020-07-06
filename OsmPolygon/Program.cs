@@ -95,6 +95,8 @@ namespace OsmPolygon
 
         static void Main(string[] args)
         {
+            Concave.Hull2.ComputeHull();
+
             // TestNpgSql();
 
             Unionizer.Test();
