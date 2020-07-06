@@ -284,11 +284,9 @@ namespace OsmPolygon.Concave
             // ctx.clearRect(0, 0, width, height);  
             ctx.Clear(System.Drawing.Color.White);
 
-            // ctx.beginPath(); 
 
             System.Drawing.Drawing2D.GraphicsPath path1 = new System.Drawing.Drawing2D.GraphicsPath();
-            path1.StartFigure();
-
+            
             int[] t = delaunay.Triangles;
             for (int i = 0; i < t.Length; i += 3)
             {
@@ -306,51 +304,45 @@ namespace OsmPolygon.Concave
                 float cx = (float)pt3.X;
                 float cy = (float)pt3.Y;
 
+                path1.StartFigure();
                 path1.AddLine(projX(ax, padding, scale, bbox), projY(ay, padding, scale, bbox), projX(bx, padding, scale, bbox), projY(by, padding, scale, bbox));
                 path1.AddLine(projX(bx, padding, scale, bbox), projY(by, padding, scale, bbox), projX(cx, padding, scale, bbox), projY(cy, padding, scale, bbox));
                 path1.CloseFigure();
-                // ctx.moveTo(projX(ax), projY(ay));
-                // ctx.lineTo(projX(bx), projY(by));
-                // ctx.lineTo(projX(cx), projY(cy));
-                // ctx.closePath();  
             }
 
-            System.Drawing.Brush brush = new System.Drawing.SolidBrush(System.Drawing.Color.Red);
-            ctx.FillPath(brush, path1);
+            System.Drawing.Pen trianglePen = new System.Drawing.Pen(System.Drawing.Color.LimeGreen);
+            ctx.DrawPath(trianglePen, path1);
 
-            //ctx.strokeStyle = 'rgba(0,200,0,0.4)';  
-            //ctx.lineWidth = 0.5;  
-            //ctx.stroke();    
-            //ctx.fillStyle = 'black';  
-
-
-            System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.HotPink);
-
-            //ctx.beginPath();  
             System.Drawing.Drawing2D.GraphicsPath path2 = new System.Drawing.Drawing2D.GraphicsPath();
-            path2.StartFigure();
+            
+
             // for (const [x, y] of points) 
             foreach (DelaunatorSharp.IPoint thisPoint in points)
             {
                 float sx = projX((float)thisPoint.X, padding, scale, bbox);
                 float sy = projY((float)thisPoint.Y, padding, scale, bbox);
                 float r = 1.5f;
-                // ctx.moveTo(sx + r, sy);    
-                // ctx.arc(sx, sy, r, 0, Math.PI* 2, false);  
-                ctx.DrawArc(pen, sx, sy, r, r, 0.0f, (float)System.Math.PI * 2.0f);
+                r = 5;
 
+                path2.StartFigure();
+                path2.AddArc(sx - r / 2.0f, sy - r / 2.0f, r, r, 0.0f, 360.0f);
                 path2.CloseFigure();
             }
-            // ctx.fill();    
 
+            System.Drawing.Brush blackBrush = new System.Drawing.SolidBrush(System.Drawing.Color.Black);
+            ctx.FillPath(blackBrush, path2);
+             
+
+            /*
             // ctx.beginPath(); 
             System.Drawing.Drawing2D.GraphicsPath path3 = new System.Drawing.Drawing2D.GraphicsPath();
-            
+            path3.StartFigure();
             for (int i = 0; i < onEdge.Length; i++)
             {
                 if (onEdge[i] != 0)
                     continue;
 
+                
                 DelaunatorSharp.IPoint pt1 = points[t[i]];
                 float ax = (float)pt1.X;
                 float ay = (float)pt1.Y;
@@ -363,21 +355,22 @@ namespace OsmPolygon.Concave
                 // ctx.moveTo(projX(ax), projY(ay));
                 // ctx.lineTo(projX(bx), projY(by));
                 // ctx.closePath();  
+                
             }
-
+            path3.CloseFigure();
             System.Drawing.Pen pen2 = new System.Drawing.Pen(System.Drawing.Color.DarkBlue);
             ctx.DrawPath(pen2, path3);
             // ctx.strokeStyle = 'blue';  
             // ctx.lineWidth = 2;  
-            // ctx.stroke();    
+            // ctx.stroke();   
+            */
 
 
             System.Drawing.Drawing2D.GraphicsPath path4 = new System.Drawing.Drawing2D.GraphicsPath();
-            // path4.StartFigure();
-            //for (const i of queue.ids) 
             foreach (var i in queue.ids)
             {
-                // ctx.beginPath();    
+                // ctx.beginPath();  
+                path4.StartFigure();
                 float sr = circumcircles.r[i] * scale;
                 float sx = projX(circumcircles.x[i], padding, scale, bbox);
                 float sy = projY(circumcircles.y[i], padding, scale, bbox);
@@ -388,11 +381,16 @@ namespace OsmPolygon.Concave
                 //ctx.stroke();    
                 //ctx.fillStyle = 'rgba(255,255,0,0.2)';    
                 //ctx.fill();  
+
+                path4.AddArc(sx - sr / 2.0f, sy - sr / 2.0f, sr, sr, 0.0f, 360.0f);
+                path4.CloseFigure();
             }
 
-            // path4.CloseFigure();
-            System.Drawing.Pen pen3 = new System.Drawing.Pen(System.Drawing.Color.Red);
-            ctx.DrawPath(pen3, path4);
+
+            System.Drawing.SolidBrush circleBrush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb((int)(0.2 * 255), 255, 255, 0));
+            System.Drawing.Pen redCircle = new System.Drawing.Pen(System.Drawing.Color.Red);
+            ctx.FillPath(circleBrush, path4);
+            ctx.DrawPath(redCircle, path4);
             
             // return ctx.canvas;
         }
@@ -421,15 +419,18 @@ namespace OsmPolygon.Concave
             System.IO.Path.GetFullPath(jsonFile);
 
             string json = System.IO.File.ReadAllText(jsonFile, System.Text.Encoding.UTF8);
+            
+            // DelaunatorSharp.IPoint[] points = Newtonsoft.Json.JsonConvert.DeserializeObject<DelaunatorSharp.IPoint[]>(json);
+
             DelaunatorSharp.IPoint[] points = Newtonsoft.Json.JsonConvert.DeserializeObject<DelaunatorSharp.Point[]>(json).Cast<DelaunatorSharp.IPoint>().ToArray();
+
             // string json = Newtonsoft.Json.JsonConvert.SerializeObject(points);
             // System.IO.File.WriteAllText(jsonFile, json,System.Text.Encoding.UTF8);
-
 
             BoundingBox bbox = GetBbox(points);
 
             // float width = bbox.maxX - bbox.minX;
-            float width = bbox.maxX;
+            float width = bbox.maxX*6;
             float padding = (float)System.Math.Round(width * 0.02);
             float scale = (width - 2 * padding) / (bbox.maxX - bbox.minX);
             float height = (float)System.Math.Ceiling(scale * (bbox.maxY - bbox.minY)) + 2 * padding;
