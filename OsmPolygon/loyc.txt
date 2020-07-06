@@ -1,0 +1,149 @@
+https://stackoverflow.com/questions/46698537/concave-hull-implementation
+https://nicoin.cor-asp.ch/FM_KantonLuzern/w8/index.html
+http://repositorium.sdum.uminho.pt/bitstream/1822/6429/1/ConcaveHull_ACM_MYS.pdf
+
+
+
+http://core.loyc.net/
+
+
+public class Hulls
+{
+
+using System;
+
+    class Point<T>
+{
+	public T X;
+	public T Y;
+}
+
+
+    private static List<Point<double>> KNearestNeighbors(List<Point<double>> points, Point<double> currentPoint, int k, out int kk)
+    {
+        kk = Math.Min(k, points.Count - 1);
+        var ret = points
+            .OrderBy(x => PointMath.Length(new Vector<double>(currentPoint.X - x.X, currentPoint.Y - x.Y)))
+            .Take(k)
+            .ToList();
+        return ret;
+    }
+    private static double Angle(Point<double> a, Point<double> b)
+    {
+        var ret = -Math.Atan2(b.Y - a.Y, b.X - a.X);
+        return NormaliseAngle(ret);
+    }
+    private static double NormaliseAngle(double a)
+    {
+        //while (a < b - Math.PI) a += Math.PI * 2;
+        //while (b < a - Math.PI) b += Math.PI * 2;
+        if (a < 0.0) { return a + Math.PI + Math.PI; }
+        return a;
+    }
+    private static List<Point<double>> SortByAngle(List<Point<double>> kNearest, Point<double> currentPoint, double angle)
+    {
+        //kNearest
+        //    .Sort((v1, v2) => AngleDifference(angle, Angle(currentPoint, v1)).CompareTo(AngleDifference(angle, Angle(currentPoint, v2))));
+        //return kNearest.ToList();
+        kNearest = kNearest.OrderByDescending(x => NormaliseAngle(Angle(currentPoint, x) - angle)).ToList();
+        return kNearest;
+    }
+
+    private static bool CCW(Point<double> p1, Point<double> p2, Point<double> p3)
+    {
+        var cw = ((p3.Y - p1.Y) * (p2.X - p1.X)) - ((p2.Y - p1.Y) * (p3.X - p1.X));
+        return cw > 0 ? true : cw < 0 ? false : true; // colinear 
+    }
+
+    private static bool _Intersect(LineSegment<double> seg1, LineSegment<double> seg2)
+    {
+        return CCW(seg1.A, seg2.A, seg2.B) != CCW(seg1.B, seg2.A, seg2.B) && CCW(seg1.A, seg1.B, seg2.A) != CCW(seg1.A, seg1.B, seg2.B);
+    }
+
+    private static bool Intersect(LineSegment<double> seg1, LineSegment<double> seg2)
+    {
+        if ((seg1.A.X == seg2.A.X && seg1.A.Y == seg2.A.Y) 
+            || (seg1.B.X == seg2.B.X && seg1.B.Y == seg2.B.Y))
+        {
+            return false;
+        }
+        if (_Intersect(seg1, seg2))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public IListSource<Point<double>> KNearestConcaveHull(List<Point<double>> points, int k)
+    {
+        points.Sort((a, b) => a.Y == b.Y ? (a.X > b.X ? 1 : -1) : (a.Y >= b.Y ? 1 : -1));
+        Console.WriteLine("Starting with size {0}", k.ToString());
+
+        DList<Point<double>> hull = new DList<Point<double>>();
+        var len = points.Count;
+
+        if (len < 3) { return null; }
+        if (len == 3) { return hull; }
+
+        var kk = Math.Min(Math.Max(k, 3), len);
+
+        var dataset = new List<Point<double>>();
+        dataset.AddRange(points.Distinct());
+
+        var firstPoint = dataset[0];
+        hull.PushFirst(firstPoint);
+
+        var currentPoint = firstPoint;
+        dataset.RemoveAt(0);
+
+        double previousAngle = 0;
+        int step = 2;
+        int i;
+        while ((currentPoint != firstPoint || step == 2) && dataset.Count > 0)
+        {
+            if (step == 5) { dataset.Add(firstPoint); }
+            var kNearest = KNearestNeighbors(dataset, currentPoint, k, out kk);
+            var cPoints = SortByAngle(kNearest, currentPoint, previousAngle);
+            var its = true;
+            i = 0;
+            while (its == true && i < cPoints.Count)
+            {
+                i++;
+                int lastPoint = 0;
+                if (cPoints[i - 1] == firstPoint)
+                {
+                    lastPoint = 1;
+                }
+                int j = 2;
+                its = false;
+                while (its == false && j < hull.Count - lastPoint)
+                {
+                    LineSegment<double> line1 = new LineSegment<double>(hull[step - 2], cPoints[i - 1]);
+                    LineSegment<double> line2 = new LineSegment<double>(hull[step - 2 - j], hull[step - 1 - j]);
+
+                    //its = LineMath.ComputeIntersection(line1, line2, out pfrac, LineType.Segment);
+                    its = Intersect(line1, line2);
+                    j++;
+                }
+            }
+            if (its == true)
+            {
+                return KNearestConcaveHull(points, kk + 1);
+            }
+            currentPoint = cPoints[i - 1];
+            hull.PushLast(currentPoint);
+            previousAngle = Angle(hull[step - 1], hull[step - 2]);
+            dataset.Remove(currentPoint); 
+            step++;
+        }
+        bool allInside = true;
+        i = dataset.Count;
+        while (allInside == true && i > 0)
+        {
+            allInside = PolygonMath.IsPointInPolygon(hull, dataset[i - 1]);
+            i--;
+        }
+        if (allInside == false) { return KNearestConcaveHull(points, kk + 1); }
+        return hull;
+    }
+}
