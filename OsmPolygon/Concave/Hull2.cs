@@ -1,4 +1,6 @@
 ﻿
+using System;
+using System.Drawing.Drawing2D;
 using Newtonsoft.Json;
 using System.Linq;
 
@@ -125,19 +127,16 @@ namespace OsmPolygon.Concave
         public float[] y;
         public float[] r;
     }
-
-
-    public class Uint8Array
-    //:System.Array
+    
+        
+    public class BoundingBox
     {
-
-        public Uint8Array(int length)
-        {
-
-        }
-
+        public float minX;
+        public float minY;
+        public float maxX;
+        public float maxY;
     }
-
+    
 
     class Hull2
     {
@@ -188,15 +187,13 @@ namespace OsmPolygon.Concave
 
 
 
-        public static void addToQueue(FlatQueue<float> queue, DelaunatorSharp.Delaunator delauny, DelaunatorSharp.IPoint[] points, Circumcircles circumcircles, int[] onEdge, int[] visited, int i)
+        public static void addToQueue(FlatQueue<float> queue, DelaunatorSharp.Delaunator delauny
+            , DelaunatorSharp.IPoint[] points, Circumcircles circumcircles, bool[] onEdge, bool[] visited, int i)
         {
-            if (i == -1)
-                return;
+            onEdge[i] = true;
 
-            onEdge[i] = 1;
-
-            visited[delauny.Triangles[i]] = 1;
-
+            visited[delauny.Triangles[i]] = true;
+            
             DelaunatorSharp.IPoint p0 = points[delauny.Triangles[i]];
             DelaunatorSharp.IPoint p1 = points[delauny.Triangles[i % 3 == 2 ? i - 2 : i + 1]];
 
@@ -208,12 +205,12 @@ namespace OsmPolygon.Concave
             float x0 = (float)p0.X;
             float y0 = (float)p0.Y;
 
-            float x1 = (float)p0.X;
-            float y1 = (float)p0.Y;
-
+            float x1 = (float)p1.X;
+            float y1 = (float)p1.Y;
+            
             // var [x0, y0] = p0;
             // var[x1, y1] = p1;
-
+            
             float area = (y - y0) * (x1 - x) - (x - x0) * (y1 - y);
             float cx = (x0 + x1) / 2;
             float cy = (y0 + y1) / 2;
@@ -221,20 +218,11 @@ namespace OsmPolygon.Concave
 
             // if the center of a circumcircle on the edge lies outside the advancing polygon, 
             // or inside but less than 0.2 circumradiuses away from the edge, queue it for collapsing
-            if (area >= 0 || d / r < 0.2)
+            if (area >= 0f || d / r < 0.2f)
                 queue.Push(i, -r);
         }
-
-
-        public class BoundingBox
-        {
-            public float minX;
-            public float minY;
-            public float maxX;
-            public float maxY;
-        }
-
-
+        
+        
         public static BoundingBox GetBbox(DelaunatorSharp.IPoint[] points)
         {
             float minX = float.PositiveInfinity;
@@ -242,7 +230,7 @@ namespace OsmPolygon.Concave
             float maxX = float.NegativeInfinity;
             float maxY = float.NegativeInfinity;
 
-            foreach (var pt in points)
+            foreach (DelaunatorSharp.IPoint pt in points)
             {
                 minX = (float)System.Math.Min(pt.X, minX);
                 minY = (float)System.Math.Min(pt.Y, minY);
@@ -278,7 +266,7 @@ namespace OsmPolygon.Concave
             , float padding
             , float scale
             , FlatQueue<float> queue
-            , int[] onEdge
+            , bool[] onEdge
         )
         {
             // ctx.clearRect(0, 0, width, height);  
@@ -310,9 +298,11 @@ namespace OsmPolygon.Concave
                 path1.CloseFigure();
             }
 
-            System.Drawing.Pen trianglePen = new System.Drawing.Pen(System.Drawing.Color.LimeGreen);
+            System.Drawing.Pen trianglePen = new System.Drawing.Pen(System.Drawing.Color.FromArgb((int)(0.4*255),0,200, 0));
+            trianglePen.Width = 0.5f;
+            trianglePen.Alignment = System.Drawing.Drawing2D.PenAlignment.Center;
             ctx.DrawPath(trianglePen, path1);
-
+            
             System.Drawing.Drawing2D.GraphicsPath path2 = new System.Drawing.Drawing2D.GraphicsPath();
             
 
@@ -333,15 +323,14 @@ namespace OsmPolygon.Concave
             ctx.FillPath(blackBrush, path2);
              
 
-            /*
+            
             // ctx.beginPath(); 
             System.Drawing.Drawing2D.GraphicsPath path3 = new System.Drawing.Drawing2D.GraphicsPath();
-            path3.StartFigure();
+            // path3.StartFigure();
             for (int i = 0; i < onEdge.Length; i++)
             {
-                if (onEdge[i] != 0)
+                if (!onEdge[i])
                     continue;
-
                 
                 DelaunatorSharp.IPoint pt1 = points[t[i]];
                 float ax = (float)pt1.X;
@@ -351,23 +340,22 @@ namespace OsmPolygon.Concave
                 float bx = (float)pt2.X;
                 float by = (float)pt2.Y;
 
+                path3.StartFigure();
                 path3.AddLine(projX(ax, padding, scale, bbox), projY(ay, padding, scale, bbox), projX(bx, padding, scale, bbox), projY(by, padding, scale, bbox));
+                path3.CloseFigure();
                 // ctx.moveTo(projX(ax), projY(ay));
                 // ctx.lineTo(projX(bx), projY(by));
                 // ctx.closePath();  
-                
             }
-            path3.CloseFigure();
-            System.Drawing.Pen pen2 = new System.Drawing.Pen(System.Drawing.Color.DarkBlue);
-            ctx.DrawPath(pen2, path3);
-            // ctx.strokeStyle = 'blue';  
-            // ctx.lineWidth = 2;  
-            // ctx.stroke();   
-            */
-
-
+            // path3.CloseFigure();
+            System.Drawing.Pen hullPen = new System.Drawing.Pen(System.Drawing.Color.Blue);
+            hullPen.Width = 2.0f;
+            ctx.DrawPath(hullPen, path3);
+            
+            
+            
             System.Drawing.Drawing2D.GraphicsPath path4 = new System.Drawing.Drawing2D.GraphicsPath();
-            foreach (var i in queue.ids)
+            foreach (int i in queue.ids)
             {
                 // ctx.beginPath();  
                 path4.StartFigure();
@@ -381,18 +369,17 @@ namespace OsmPolygon.Concave
                 //ctx.stroke();    
                 //ctx.fillStyle = 'rgba(255,255,0,0.2)';    
                 //ctx.fill();  
-
+                
                 path4.AddArc(sx - sr / 2.0f, sy - sr / 2.0f, sr, sr, 0.0f, 360.0f);
                 path4.CloseFigure();
             }
-
-
+            
             System.Drawing.SolidBrush circleBrush = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb((int)(0.2 * 255), 255, 255, 0));
-            System.Drawing.Pen redCircle = new System.Drawing.Pen(System.Drawing.Color.Red);
+            System.Drawing.Pen redCircle = new System.Drawing.Pen(System.Drawing.Color.FromArgb(255,200,0,0));
+            redCircle.Width = 1;
+            redCircle.Alignment = System.Drawing.Drawing2D.PenAlignment.Center;
             ctx.FillPath(circleBrush, path4);
             ctx.DrawPath(redCircle, path4);
-            
-            // return ctx.canvas;
         }
 
 
@@ -411,22 +398,55 @@ namespace OsmPolygon.Concave
         console.log(foo.join("\r\n"));
         */
 
+
+
+        public static DelaunatorSharp.IPoint[] EnhancePointDensity( DelaunatorSharp.IPoint[] points, int numPointsOnLine)
+        {
+            System.Collections.Generic.List<DelaunatorSharp.IPoint> newList =
+                new System.Collections.Generic.List<DelaunatorSharp.IPoint>();
+            
+            for (int i = 0; i < points.Length; ++i)
+            {
+                DelaunatorSharp.IPoint thisPoint = points[i];
+                newList.Add(thisPoint);
+
+                if (i < points.Length - 1)
+                {
+                    DelaunatorSharp.IPoint nextPoint = points[i + 1];
+
+                    double deltaX = nextPoint.X - thisPoint.X;
+                    double deltaY = nextPoint.Y - thisPoint.Y;
+
+                    deltaX = deltaX / numPointsOnLine;
+                    deltaY = deltaY / numPointsOnLine;
+
+                    for (int j = 0; j < numPointsOnLine; ++j)
+                    {
+                        DelaunatorSharp.IPoint newPoint = new DelaunatorSharp.Point(thisPoint.X + j * deltaX, thisPoint.Y + j * deltaY);
+                        newList.Add(newPoint);
+                    }
+                }
+            }
+
+            return newList.ToArray();
+        }
+
+
         // https://observablehq.com/@mourner/adaptive-concave-hull
         // https://mapbox.github.io/delaunator/
         public static void ComputeHull()
         {
             string jsonFile = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "DelaunatorPoints.json");
-            System.IO.Path.GetFullPath(jsonFile);
-
+            jsonFile = System.IO.Path.GetFullPath(jsonFile);
+            
             string json = System.IO.File.ReadAllText(jsonFile, System.Text.Encoding.UTF8);
             
             // DelaunatorSharp.IPoint[] points = Newtonsoft.Json.JsonConvert.DeserializeObject<DelaunatorSharp.IPoint[]>(json);
-
             DelaunatorSharp.IPoint[] points = Newtonsoft.Json.JsonConvert.DeserializeObject<DelaunatorSharp.Point[]>(json).Cast<DelaunatorSharp.IPoint>().ToArray();
-
+            points = EnhancePointDensity(points, 10);
             // string json = Newtonsoft.Json.JsonConvert.SerializeObject(points);
             // System.IO.File.WriteAllText(jsonFile, json,System.Text.Encoding.UTF8);
-
+            
             BoundingBox bbox = GetBbox(points);
 
             // float width = bbox.maxX - bbox.minX;
@@ -441,34 +461,27 @@ namespace OsmPolygon.Concave
             Circumcircles circumcircles = ComputeCircumcircles(points, delauny);
 
             FlatQueue<float> queue = new FlatQueue<float>();
-            int[] onEdge = new int[delauny.Halfedges.Length];
-            int[] visited = new int[points.Length];
-
-
-
+            bool[] onEdge = new bool[delauny.Halfedges.Length];
+            bool[] visited = new bool[points.Length];
+            
+            
             for (int i = 0; i < delauny.Halfedges.Length; i++) 
             {
                 if (delauny.Halfedges[i] == -1)
-                    addToQueue(queue, delauny, points, circumcircles, onEdge, visited, 1); // start with convex hull edges
+                    addToQueue(queue, delauny, points, circumcircles, onEdge, visited, i); // start with convex hull edges
             }
-
+            
             // var ctx = DOM.context2d(width, height);
-
-
+            
             int imageCount = 0;
-
             System.Drawing.Bitmap bmp = new System.Drawing.Bitmap((int) width, (int)height);
-
-
+            
             using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bmp))
             {
-
-                // yield draw(ctx, queue, onEdge);
-                Draw(delauny, points, bbox, circumcircles, g, padding, scale, queue, onEdge);
-                bmp.Save(@"D:\TestImage" + imageCount + ".png", System.Drawing.Imaging.ImageFormat.Png);
-                imageCount++;
-
-
+                // Draw(delauny, points, bbox, circumcircles, g, padding, scale, queue, onEdge);
+                // bmp.Save(@"D:\TestImage" + imageCount + ".png", System.Drawing.Imaging.ImageFormat.Png);
+                // imageCount++;
+                
                 while (true)
                 {
                     int? i = queue.Pop();
@@ -477,21 +490,32 @@ namespace OsmPolygon.Concave
 
                     int i1 = delauny.Halfedges[i.Value % 3 == 2 ? i.Value - 2 : i.Value + 1];
                     int i2 = delauny.Halfedges[i.Value % 3 == 0 ? i.Value + 2 : i.Value - 1];
-                    if (i1 != -1 && i2 != -1 && visited[delauny.Triangles[i1]] == 0)
+                    if (i1 != -1 && i2 != -1 && !visited[delauny.Triangles[i1]])
                     {
                         addToQueue(queue, delauny, points, circumcircles, onEdge, visited, i1);
                         addToQueue(queue, delauny, points, circumcircles, onEdge, visited, i2);
-                        onEdge[i.Value] = 0;
+                        onEdge[i.Value] = false;
                     }
-
+                    
                     // yield draw(ctx, queue, onEdge);
-                    Draw(delauny, points, bbox, circumcircles, g, padding, scale, queue, onEdge);
-                    bmp.Save(@"D:\TestImage" + imageCount + ".png", System.Drawing.Imaging.ImageFormat.Png);
-                    imageCount++;
-                }
-
-            }
-
+                    // Draw(delauny, points, bbox, circumcircles, g, padding, scale, queue, onEdge);
+                    
+                    // if(System.Environment.OSVersion.Platform == PlatformID.Unix)
+                    //     bmp.Save(@"TestImage" + imageCount + ".png", System.Drawing.Imaging.ImageFormat.Png);
+                    // else
+                    //     bmp.Save(@"D:\TestImage" + imageCount + ".png", System.Drawing.Imaging.ImageFormat.Png);
+                    
+                    // imageCount++;
+                } // Whend 
+                
+                Draw(delauny, points, bbox, circumcircles, g, padding, scale, queue, onEdge);
+                    
+                if(System.Environment.OSVersion.Platform == PlatformID.Unix)
+                    bmp.Save(@"TestImage.png", System.Drawing.Imaging.ImageFormat.Png);
+                else
+                    bmp.Save(@"D:\TestImage.png", System.Drawing.Imaging.ImageFormat.Png);
+            } // End Using g 
+            
             System.Console.Write("finished");
         }
 
