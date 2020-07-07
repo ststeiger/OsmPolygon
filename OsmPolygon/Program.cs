@@ -95,6 +95,7 @@ namespace OsmPolygon
 
         static void Main(string[] args)
         {
+            OsmPolygon.Concave.COORDS.TestCoordinateConverion.Test();
             Concave.Hull2.ComputeHull();
 
             // TestNpgSql();
