@@ -5,12 +5,6 @@ using System.Text;
 
 namespace OsmPolygon.Concave.COORDS
 {
-    //
-    // Source code recreated from a .class file by IntelliJ IDEA
-    // (powered by Fernflower decompiler)
-    //
-
-    
 
 
     public class FastMath
@@ -22,7 +16,8 @@ namespace OsmPolygon.Concave.COORDS
         static readonly int EXP_INT_TABLE_LEN = 1500;
         static readonly int LN_MANT_LEN = 1024;
         static readonly int EXP_FRAC_TABLE_LEN = 1025;
-        // private static readonly double LOG_MAX_VALUE = StrictMath.log(1.7976931348623157E308D);
+        private static readonly double LOG_MAX_VALUE =  StrictMath.Log(1.7976931348623157E308D);
+
         private static readonly bool RECOMPUTE_TABLES_AT_RUNTIME = false;
         private static readonly double LN_2_A = 0.6931470632553101D;
         private static readonly double LN_2_B = 1.1730463525082348E-7D;

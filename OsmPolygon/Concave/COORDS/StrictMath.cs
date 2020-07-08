@@ -4,6 +4,13 @@ namespace OsmPolygon.Concave.COORDS
     class StrictMath
     {
 
+
+        public static double Log(double d)
+        {
+            return System.Math.Log(d);
+        }
+
+
         // https://stackoverflow.com/questions/1971645/is-System.Math-ieeeremainderx-y-equivalent-to-xy
         public static double IEEEremainder1(double f1, double f2)
         {
