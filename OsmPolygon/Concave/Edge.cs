@@ -1,37 +1,39 @@
-﻿using NetTopologySuite.Geometries;
+﻿/*
+* This file is part of the OpenSphere project which aims to
+* develop geospatial algorithms.
+* 
+* Copyright (C) 2012 Eric Grosso
+*
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or (at your option) any later version.
+*
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public
+* License along with this library; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+*
+* For more information, contact:
+* Eric Grosso, eric.grosso.os@gmail.com
+* 
+*/
+
+
+using NetTopologySuite.Geometries;
 using NetTopologySuite.Triangulate.QuadEdge;
 using System.Collections.Generic;
 
 
 namespace NetTopologySuite.Hull
 {
-    /*
- * This file is part of the OpenSphere project which aims to
- * develop geospatial algorithms.
- * 
- * Copyright (C) 2012 Eric Grosso
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- *
- * For more information, contact:
- * Eric Grosso, eric.grosso.os@gmail.com
- * 
- */
 
-
-    // Edge. @author Eric Grosso
+    // Original Author: Eric Grosso, eric.grosso.os@gmail.com
+    // Conversion to C#: Stefan Steiger 
     public class Edge
     {
         // ID of the edge 
@@ -56,31 +58,29 @@ namespace NetTopologySuite.Hull
         private List<Edge> incidentEdges = new List<Edge>();
 
 
-        // Default constructor.
         public Edge()
         { }
         
         
-        // Constructor.
-        // @param id ID of the edge
+        // ID of the edge
         public Edge(int id)
         {
             this.id = id;
         }
 
 
-        // Constructor. 
-        // @param id ID of the edge
-        // @param geometry geometry of the edge (segment)
+        
+        // ID of the edge
+        // geometry of the edge (segment)
         public Edge(int id, LineSegment geometry)
         {
             this.id = id;
             this.geometry = geometry;
         }
 
-        // Constructor.
-        // @param id ID of the edge
-        // @param border
+        // Constructor
+        // ID of the edge
+        //  border
         // 		defines if the edge is a border edge
         // 		or not in the triangulation framework
         public Edge(int id, bool border)
@@ -89,12 +89,12 @@ namespace NetTopologySuite.Hull
             this.border = border;
         }
 
-        // Constructor.
-        // @param id ID of the edge
-        // @param geometry geometry of the edge (segment)
-        // @param border
-        //  		defines if the edge is a border edge
-        // 		or not in the triangulation framework
+
+        // ID of the edge
+        // geometry of the edge (segment)
+        // border
+        //     defines if the edge is a border edge
+        // 	   or not in the triangulation framework
         public Edge(int id, LineSegment geometry, bool border)
         {
             this.id = id;
@@ -103,11 +103,11 @@ namespace NetTopologySuite.Hull
         }
 
         // Constructor.
-        // @param id ID of the edge
-        // @param geometry geometry of the edge (segment)
-        // @param oV origin vertex
-        // @param eV end vertex
-        // @param border
+        // ID of the edge
+        // geometry of the edge (segment)
+        // oV: origin vertex
+        // eV: end vertex
+        // border: 
         //		defines if the edge is a border edge
         //		or not in the triangulation framework
         public Edge(int id, LineSegment geometry, Vertex oV, Vertex eV, bool border)
@@ -121,7 +121,6 @@ namespace NetTopologySuite.Hull
         
         
         // Returns the ID of the edge.
-        // @return the ID of the edge
         public int Id
         {
             get { return this.id; }
@@ -130,7 +129,6 @@ namespace NetTopologySuite.Hull
 
 
         // Returns the geometry of the edge.
-        // @return the geometry of the edge
         public LineSegment Geometry
         {
             get { return this.geometry; }
@@ -150,8 +148,6 @@ namespace NetTopologySuite.Hull
 
 
         // Returns the origin vertex of the edge.
-		// @return the origin vertex of the edge
-		// @param value origin vertex of the edge
         public Vertex OV
         {
             get { return this.oV; }
@@ -160,7 +156,6 @@ namespace NetTopologySuite.Hull
 
 
         // Returns the end vertex of the edge.
-		// @return the end vertex of the edge
         public Vertex EV
         {
             get { return this.eV; }
@@ -169,7 +164,6 @@ namespace NetTopologySuite.Hull
         
         
         // Defines/Returns the triangles in relationship with the edge.
-        // @return the triangles in relationship with the edge
         public List<Triangle> Triangles
         {
             get { return this.triangles; }
@@ -178,7 +172,6 @@ namespace NetTopologySuite.Hull
 
 
         // Gets/Sets the edges in relationship with the edge.
-        // @return the edges in relationship with the edge
         public List<Edge> IncidentEdges
         {
             get { return this.incidentEdges; }
@@ -187,7 +180,7 @@ namespace NetTopologySuite.Hull
 
 
         // Add a triangle in relationship with the edge.
-        // @return true if added, false otherwise
+        // returns true if added, false otherwise
         public bool AddTriangle(Triangle triangle)
         {
             this.Triangles.Add(triangle);
@@ -196,7 +189,7 @@ namespace NetTopologySuite.Hull
         
 
         // Add triangles in relationship with the edge.
-        // @return true if added, false otherwise
+        // returns true if added, false otherwise
         public bool AddTriangles(List<Triangle> triangles)
         {
             this.Triangles.AddRange(triangles);
@@ -205,14 +198,15 @@ namespace NetTopologySuite.Hull
 
 
         // Remove a triangle in relationship with the edge.
-        // @return true if removed, false otherwise
+        // returns true if removed, false otherwise
         public bool RemoveTriangle(Triangle triangle)
         {
             return this.Triangles.Remove(triangle);
         }
 
+
         // Remove triangles in relationship with the edge. 
-        // @return true if removed, false otherwise
+        // returns true if removed, false otherwise
         public bool RemoveTriangles(List<Triangle> trianglesToRemove)
         {
             foreach (Triangle t in trianglesToRemove)
@@ -223,24 +217,27 @@ namespace NetTopologySuite.Hull
             return true;
         }
 
+
         // Add an incident edge in relationship with the edge.
-        // @return true if added, false otherwise
+        // returns true if added, false otherwise
         public bool AddIncidentEdge(Edge edge)
         {
             this.incidentEdges.Add(edge);
             return true;
         }
 
+
         // Add incident edges in relationship with the edge. 
-        // @return true if added, false otherwise
+        // return true if added, false otherwise
         public bool AddIncidentEdges(List<Edge> edges)
         {
             this.incidentEdges.AddRange(edges);
             return true;
         }
 
+
         // Remove an incident edge in relationship with the edge.
-		// @return true if removed, false otherwise
+		// returns true if removed, false otherwise
         public bool RemoveIncidentEdge(Edge edge)
         {
             return this.incidentEdges.Remove(edge);
@@ -248,7 +245,7 @@ namespace NetTopologySuite.Hull
         
         
         // Remove incident edges in relationship with the edge.
-		// @return true if removed, false otherwise
+		// returns true if removed, false otherwise
         public bool RemoveAllIncidentEdges(List<Edge> edgesToRemove)
         {
             foreach (Edge t in edgesToRemove)

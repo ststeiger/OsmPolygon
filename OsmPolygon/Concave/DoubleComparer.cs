@@ -35,7 +35,7 @@ namespace NetTopologySuite.Hull
 
     // Comparator of a map containing QuadEdge as key
     // and Double as value (Double comparator).
-    // @author Eric Grosso
+    // Author: Eric Grosso
     // modified for use in C# List Stefan Steiger 
     internal class DoubleComparator 
         : IComparer<KeyValuePair<QuadEdge, double>>
@@ -43,8 +43,6 @@ namespace NetTopologySuite.Hull
         Dictionary<QuadEdge, double> map;
 
 
-        // Constructor.
-        // @param map map containing QuadEdge and Double
         public DoubleComparator(Dictionary<QuadEdge, double> map)
         {
             this.map = map;
@@ -52,9 +50,9 @@ namespace NetTopologySuite.Hull
 
 
         // Method of comparison.
-        // @param qeA quad edge to compare
-        // @param qeB quad edge to compare
-        // @return
+        // qeA: quad edge to compare
+        // qeB: quad edge to compare
+        // return
         // 		1 if double value associated to qeA  < double
         // 		value associated to qeB,
         // 		0 if values are equals,

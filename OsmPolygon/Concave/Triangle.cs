@@ -22,13 +22,15 @@
  * Eric Grosso, eric.grosso.os@gmail.com
  * 
  */
+
 namespace NetTopologySuite.Hull
 {
 
 	using System.Collections.Generic;
 
 
-	// Triangle. @author Eric Grosso
+	// Original Author: Eric Grosso, eric.grosso.os@gmail.com
+	// Converted to C#: Stefan Steiger
 	public class Triangle
 	{
 
@@ -45,23 +47,22 @@ namespace NetTopologySuite.Hull
 		// Neighbour triangles of this triangle
 		private List<Triangle> neighbours = new System.Collections.Generic.List<Triangle>();
 
-		// vertices...
-		
-		
-		// Default constructor.
+
+
 		public Triangle()
 		{ }
 
+
 		// Constructor.
-		// @param id ID of the triangle
+		// ID of the triangle
 		public Triangle(int id)
 		{
 			this.id = id;
 		}
 
 		// Constructor.
-		// @param id ID of the triangle
-		// @param border defines if the triangle is a border triangle or not in the triangulation framework 
+		// ID of the triangle
+		// border defines if the triangle is a border triangle or not in the triangulation framework 
 		public Triangle(int id, bool border)
 		{
 			this.id = id;
@@ -69,7 +70,7 @@ namespace NetTopologySuite.Hull
 		}
 
 		// Defines/Returns the ID of the triangle.
-		// @param id ID of the triangle
+		// id ID of the triangle
 		public int Id
 		{
 			get{ return this.id; }
@@ -79,9 +80,7 @@ namespace NetTopologySuite.Hull
 		
 		// Returns/Defines the indicator to know if the triangle
 		// is a border triangle of the triangulation framework.
-		// @param border
-		// true if the triangle is a border triangle,
-		// false otherwise
+		// true if the triangle is a border triangle, false otherwise
 		public bool Border
 		{
 			get { return this.border; }
@@ -90,7 +89,7 @@ namespace NetTopologySuite.Hull
 		
 		
 		// Defines/Returns the edges which compose the triangle.
-		// @return the edges which compose the triangle
+		// return the edges which compose the triangle
 		public List<Edge> Edges
 		{
 			get { return this.edges; }
@@ -99,7 +98,7 @@ namespace NetTopologySuite.Hull
 		
 		
 		// Defines/Returns the neighbour triangles of the triangle.
-		// @return the neighbour triangles of the triangle
+		// return the neighbour triangles of the triangle
 		public List<Triangle> Neighbours
 		{
 			get
@@ -121,16 +120,18 @@ namespace NetTopologySuite.Hull
 			return true;
 		}
 
+
 		// Add edges to the triangle.
-		// @return true if added, false otherwise
+		// return true if added, false otherwise
 		public bool AddEdges(List<Edge> edges)
 		{
 			this.edges.AddRange(edges);
 			return true;
 		}
 
+
 		// Remove an edge of the triangle.
-		// @return true if removed, false otherwise
+		// return true if removed, false otherwise
 		public bool RemoveEdge(Edge edge)
 		{
 			return this.edges.Remove(edge);
@@ -138,7 +139,7 @@ namespace NetTopologySuite.Hull
 		
 		
 		// Remove edges of the triangle.
-		// @return true if removed, false otherwise
+		// return true if removed, false otherwise
 		public bool RemoveEdges(List<Edge> edgesToRemove)
 		{
 			foreach (Edge thisEdge in edgesToRemove)
@@ -151,7 +152,7 @@ namespace NetTopologySuite.Hull
 
 
 		// Add a neighbour triangle to the triangle.
-		// @return true if added, false otherwise
+		// return true if added, false otherwise
 		public bool AddNeighbour(Triangle triangle)
 		{
 			this.neighbours.Add(triangle);
@@ -160,7 +161,7 @@ namespace NetTopologySuite.Hull
 		
 		
 		// Add neighbour triangles to the triangle.
-		// @return true if added, false otherwise
+		// return true if added, false otherwise
 		public bool AddNeighbours(List<Triangle> triangles)
 		{
 			this.neighbours.AddRange(triangles);
@@ -169,14 +170,15 @@ namespace NetTopologySuite.Hull
 		
 		
 		// Remove a neighbour triangle of the triangle.
-		// @return true if removed, false otherwise
+		// return true if removed, false otherwise
 		public bool RemoveNeighbour(Triangle triangle)
 		{
 			return this.neighbours.Remove(triangle);
 		}
 
+
 		// Remove neighbour triangles of the triangle.
-		// @return true if removed, false otherwise
+		// return true if removed, false otherwise
 		public bool RemoveNeighbours(List<Triangle> triangles)
 		{
 			foreach (Triangle t in triangles)
@@ -186,6 +188,7 @@ namespace NetTopologySuite.Hull
 			
 			return true;
 		}
+
 
 	}
 

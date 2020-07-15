@@ -1,8 +1,6 @@
 ﻿
-using System;
-using System.Drawing.Drawing2D;
-using Newtonsoft.Json;
 using System.Linq;
+
 
 namespace OsmPolygon.Concave
 {
@@ -510,7 +508,7 @@ namespace OsmPolygon.Concave
                 
                 Draw(delauny, points, bbox, circumcircles, g, padding, scale, queue, onEdge);
                     
-                if(System.Environment.OSVersion.Platform == PlatformID.Unix)
+                if(System.Environment.OSVersion.Platform == System.PlatformID.Unix)
                     bmp.Save(@"TestImage.png", System.Drawing.Imaging.ImageFormat.Png);
                 else
                     bmp.Save(@"D:\TestImage.png", System.Drawing.Imaging.ImageFormat.Png);
