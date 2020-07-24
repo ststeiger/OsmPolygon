@@ -21,8 +21,8 @@ namespace NetTopologySuite.Hull
         private GeometryFactory geomFactory;
         private readonly GeometryCollection geometries;
         private double threshold;
-        
-        
+
+
         public Dictionary<LineSegment, int> segments = new Dictionary<LineSegment, int>();
         public Dictionary<int, Edge> edges = new Dictionary<int, Edge>();
         public Dictionary<int, Triangle> triangles = new Dictionary<int, Triangle>();
@@ -32,25 +32,26 @@ namespace NetTopologySuite.Hull
 
         public Dictionary<Coordinate, int> coordinates = new Dictionary<Coordinate, int>();
         public Dictionary<int, Vertex> vertices = new Dictionary<int, Vertex>();
-        
+
 
 
         public ConcaveHull(Geometry geometry, double threshold)
         {
-            this.geometries = transformIntoPointGeometryCollection(geometry);
+            this.geometries = TransformIntoPointGeometryCollection(geometry);
             this.threshold = threshold;
             this.geomFactory = geometry.Factory;
-        }
+        } // End Constructor 
 
 
         public ConcaveHull(GeometryCollection geometries, double threshold)
         {
-            this.geometries = transformIntoPointGeometryCollection(geometries);
+            this.geometries = TransformIntoPointGeometryCollection(geometries);
             this.threshold = threshold;
             this.geomFactory = geometries.Factory;
-        }
+        } // End Constructor 
 
-        private static GeometryCollection transformIntoPointGeometryCollection(Geometry geom)
+
+        private static GeometryCollection TransformIntoPointGeometryCollection(Geometry geom)
         {
             Utilities.UniqueCoordinateArrayFilter filter = new Utilities.UniqueCoordinateArrayFilter();
             geom.Apply(filter);
@@ -62,15 +63,16 @@ namespace NetTopologySuite.Hull
                 Coordinate[] c = new Coordinate[] { coord[i] };
                 CoordinateArraySequence cs = new CoordinateArraySequence(c);
                 geometries[i] = new Point(cs, geom.Factory);
-            }
+            } // Next i 
 
             return new GeometryCollection(geometries, geom.Factory);
-        }
+        } // End Function TransformIntoPointGeometryCollection 
+
 
         // Transform into GeometryCollection. 
-	    // @param geom input geometry
-	    // @return a geometry collection
-        private static GeometryCollection transformIntoPointGeometryCollection(GeometryCollection gc)
+        // @param geom input geometry
+        // @return a geometry collection
+        private static GeometryCollection TransformIntoPointGeometryCollection(GeometryCollection gc)
         {
             Utilities.UniqueCoordinateArrayFilter filter = new Utilities.UniqueCoordinateArrayFilter();
             gc.Apply(filter);
@@ -82,11 +84,10 @@ namespace NetTopologySuite.Hull
                 Coordinate[] c = new Coordinate[] { coord[i] };
                 CoordinateArraySequence cs = new CoordinateArraySequence(c);
                 geometries[i] = new Point(cs, gc.Factory);
-            }
+            } // Next i 
 
             return new GeometryCollection(geometries, gc.Factory);
-        }
-
+        } // End Function TransformIntoPointGeometryCollection 
 
 
         // Returns a {@link Geometry} that represents the concave hull of the input
@@ -101,7 +102,8 @@ namespace NetTopologySuite.Hull
 
         public Geometry GetConcaveHull
         {
-            get{
+            get
+            {
                 if (this.geometries.NumGeometries == 0)
                 {
                     return this.geomFactory.CreateGeometryCollection(null);
@@ -119,7 +121,7 @@ namespace NetTopologySuite.Hull
 
                 return ComputeConcaveHull();
             }
-        }
+        } // End Function GetConcaveHull 
 
 
         public Geometry ComputeConcaveHull()
@@ -137,14 +139,14 @@ namespace NetTopologySuite.Hull
             foreach (Vertex v in qeVertices)
             {
                 this.coordinates[v.Coordinate] = iV;
-                this.vertices[iV] = new Vertex(iV, v.Coordinate); 
+                this.vertices[iV] = new Vertex(iV, v.Coordinate);
                 iV++;
             }
-            
+
             List<QuadEdge> qeFrameBorder = new List<QuadEdge>();
             List<QuadEdge> qeFrame = new List<QuadEdge>();
             List<QuadEdge> qeBorder = new List<QuadEdge>();
-            
+
             // here each one more
             foreach (QuadEdge qe in quadEdges)
             {
@@ -179,13 +181,13 @@ namespace NetTopologySuite.Hull
 
 
             Dictionary<QuadEdge, double> qeDistances = new Dictionary<QuadEdge, double>();
-            
+
             foreach (QuadEdge qe in quadEdges)
             {
                 qeDistances.Add(qe, qe.ToLineSegment().Length);
             }
 
-            
+
             DoubleComparator dc = new DoubleComparator(qeDistances);
             // This doesn't work with dictionary - missing duplicates ...
             List<KeyValuePair<QuadEdge, double>> qeSorted = new List<KeyValuePair<QuadEdge, double>>();
@@ -213,7 +215,7 @@ namespace NetTopologySuite.Hull
                 {
                     oV.IsBorder = true;
                     eV.IsBorder = true;
-                    
+
                     edge = new Edge(i, s, oV, eV, true);
 
                     if (s.Length < this.threshold)
@@ -336,7 +338,7 @@ namespace NetTopologySuite.Hull
                             this.triangles.Remove(triangle.Id);
                             tA.RemoveNeighbour(triangle);
                             tB.RemoveNeighbour(triangle);
-                            
+
                             // new edges
                             List<Edge> ee = triangle.Edges;
                             Edge eA = ee[0];
@@ -350,7 +352,7 @@ namespace NetTopologySuite.Hull
 
                                 eB.OV.IsBorder = true;
                                 eB.EV.IsBorder = true;
-                                
+
                                 eC.Border = true;
 
                                 eC.OV.IsBorder = true;
@@ -417,14 +419,14 @@ namespace NetTopologySuite.Hull
                             else
                             {
                                 this.edges.Remove(eC.Id);
-                                eA.Border = true; 
+                                eA.Border = true;
 
                                 eA.OV.IsBorder = true;
                                 eA.EV.IsBorder = true;
                                 eB.Border = true;
                                 eB.OV.IsBorder = true;
                                 eB.EV.IsBorder = true;
-                                
+
                                 // clean the relationships with the triangle
                                 eA.RemoveTriangle(triangle);
                                 eB.RemoveTriangle(triangle);
@@ -449,11 +451,11 @@ namespace NetTopologySuite.Hull
 
                                 this.lengths.Remove(eC.Id);
                             } // End Else of if (e0.OV.Border && e0.EV.Border && e1.OV.Border && e1.EV.Border)
-                            
+
                         } // End Else of if 
-                        
+
                     } // End Else of if (neighbours.Count == 1)
-                    
+
                 } // End if (index != -1) 
 
             } // Whend 
@@ -475,27 +477,27 @@ namespace NetTopologySuite.Hull
             // merge
             Operation.Linemerge.LineMerger lineMerger = new Operation.Linemerge.LineMerger();
             lineMerger.Add(edges);
-            
+
             LineString merge = null;
-            
+
             using (IEnumerator<Geometry> en = lineMerger.GetMergedLineStrings().GetEnumerator())
             {
                 en.MoveNext();
                 merge = (LineString)en.Current;
             }
-            
+
             if (merge.IsRing)
             {
                 LinearRing lr = new LinearRing(merge.CoordinateSequence, this.geomFactory);
                 Polygon concaveHull = new Polygon(lr, null, this.geomFactory);
                 return concaveHull;
             }
-            
+
             return merge;
-        }
-        
-        
-    }
-    
-    
-}
+        } // End Function ComputeConcaveHull 
+
+
+    } // End Class ConcaveHull 
+
+
+} // End Namespace NetTopologySuite.Hull 
