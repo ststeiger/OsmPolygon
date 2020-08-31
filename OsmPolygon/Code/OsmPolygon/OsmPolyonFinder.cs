@@ -41,10 +41,6 @@ namespace OsmPolygon
             csb.DataSource = SecretManager.GetSecret<string>("DefaultDataSource");
             csb.InitialCatalog = SecretManager.GetSecret<string>("DefaultCatalog");
 
-
-            csb.DataSource = System.Environment.MachineName;
-            csb.InitialCatalog = "COR_Basic_KantonLuzern";
-
             csb.IntegratedSecurity = false;
 
             csb.IntegratedSecurity = System.StringComparer.OrdinalIgnoreCase.Equals(System.Environment.UserDomainName, "COR");

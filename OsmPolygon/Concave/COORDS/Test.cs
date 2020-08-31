@@ -3,7 +3,7 @@ namespace OsmPolygon.Concave.COORDS
 {
 
 
-    class TestCoordinateConverion
+    class TestCoordinateConversion
     {
 
 

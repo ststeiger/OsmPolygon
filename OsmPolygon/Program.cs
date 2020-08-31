@@ -22,7 +22,7 @@ namespace OsmPolygon
             // args = new string[] { "37037133" };
             // args = new string[] { "377701803" };
             // args = new string[] { "101768609", "442482822", "442482820" };
-            args = new string[] {"231594843"};
+            args = new string[] { "218557959" };
 
             for (int i = 0; i < args.Length; ++i)
             {
@@ -39,17 +39,17 @@ namespace OsmPolygon
 
         static void Main(string[] args)
         {
-            OsmPolygon.Concave.COORDS.TestCoordinateConverion.Test();
-            Concave.Hull2.ComputeHull();
+            // OsmPolygon.Concave.COORDS.TestCoordinateConversion.Test(); // Bad 
+            // Concave.Hull2.ComputeHull(); // Bad
 
-            Unionizer.Test();
+            // Unionizer.Test(); // Merge N polygons to 1 Polygon with Concave Hull
 
             // Do it all automatically: 
             // OsmPolyonFinder.GetAndInsertBuildingPolygon();
             // EsriConverter.ESRI.Test();
             // MoveMe.MoveMe.TestArea();
 
-            // CreateImportScriptForPolygonByWayId(args);
+            CreateImportScriptForPolygonByWayId(args);
 
             // OsmPolygonHelper.Test();
 
