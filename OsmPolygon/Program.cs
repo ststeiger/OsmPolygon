@@ -1,12 +1,12 @@
-﻿    
+﻿
 namespace OsmPolygon
 {
-    
-    
+
+
     class Program
     {
-        
-        
+
+
         public static void CreateImportScriptForPolygonByWayId(string[] args)
         {
             // Do it manually: 
@@ -33,9 +33,15 @@ namespace OsmPolygon
                 System.IO.File.WriteAllText(way + ".sql", script, System.Text.Encoding.UTF8);
                 System.Console.WriteLine(script);
             } // Next i 
-            
+
         } // End Sub CreateImportScriptForPolygonByWayId 
-        
+
+        //get closest Longitude that is on a 15 deg multiple.
+        public static double calculate_LongitudeTimeZone(double longitude)
+        {
+            return (System.Math.Round(longitude / 15d)) * 15d;
+        }
+
 
         static void Main(string[] args)
         {
@@ -67,9 +73,9 @@ namespace OsmPolygon
                 System.Threading.Thread.Sleep(100);
             } // Whend 
         } // End Sub WaitForExit 
-        
-        
+
+
     } // End Class Program 
-    
-    
+
+
 } // End Namespace OsmPolygon 
