@@ -27,13 +27,13 @@
  * Portions Copyright IBM Corporation, 2001. All Rights Reserved.
  */
 
-
+/*
 
 using System;
 using System.Numerics;
 using System.Text;
 using System.Threading;
-
+*/
 // import java.util.Arrays;
 // import static java.math.BigInteger.LONG_MASK;
 
@@ -48,33 +48,36 @@ namespace RosettaDecimalToFraction
 
     // https://stackoverflow.com/questions/25694153/decimal-to-fraction
 
+
     public class Fraction
     {
         public long Numerator;
         public long Denominator;
+
+
         public Fraction(double f, long MaximumDenominator = 4096)
         {
-            /* Translated from the C version. */
-            /*  a: continued fraction coefficients. */
+            // Translated from the C version.
+            //  a: continued fraction coefficients.
             long a;
             long[] h = new long[3] { 0, 1, 0 };
             long[] k = new long[3] { 1, 0, 0 };
-            Int64 x, d, n = 1;
+            long x, d, n = 1;
             int i, neg = 0;
 
             if (MaximumDenominator <= 1)
             {
                 Denominator = 1;
-                Numerator = (Int64)f;
+                Numerator = (long)f;
                 return;
             }
 
             if (f < 0) { neg = 1; f = -f; }
 
-            while (f != Math.Floor(f)) { n <<= 1; f *= 2; }
-            d = (Int64)f;
+            while (f != System.Math.Floor(f)) { n <<= 1; f *= 2; }
+            d = (long)f;
 
-            /* continued fraction and check denominator each step */
+            // continued fraction and check denominator each step
             for (i = 0; i < 64; i++)
             {
                 a = (n != 0) ? d / n : 0;
@@ -111,13 +114,12 @@ namespace RosettaDecimalToFraction
     {
         static void Test(string[] args)
         {
-            Console.OutputEncoding = UTF8Encoding.UTF8;
+            System.Console.OutputEncoding = System.Text.UTF8Encoding.UTF8;
             foreach (double d in new double[] { 0.9054054, 0.518518, 0.75, 0.4285714, 0.833333,
                 0.90909, 3.14159265358979, 2.7182818284590451 })
             {
-                var f = new Fraction(d, d >= 2 ? 65536 : 4096);
-                Console.WriteLine("{0,20} → {1}", d, f);
-
+                Fraction f = new Fraction(d, d >= 2 ? 65536 : 4096);
+                System.Console.WriteLine("{0,20} → {1}", d, f);
             }
         }
     }

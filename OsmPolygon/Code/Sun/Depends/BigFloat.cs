@@ -6,6 +6,7 @@ namespace OsmPolygon.sunrisesunset
     using System.Linq;
     using System.Text;
     using System.Numerics;
+    using System.Runtime.CompilerServices;
 
 
     // https://docs.oracle.com/javase/7/docs/api/java/math/RoundingMode.html
@@ -21,7 +22,7 @@ namespace OsmPolygon.sunrisesunset
         ,UP // Rounding mode to round away from zero.
     }
 
-    // https://github.com/openjdk-mirror/jdk7u-jdk/blob/master/src/share/classes/java/math/BigDecimal.java
+    // https://github.com/openjdk/jdk/blob/master/src/java.base/share/classes/java/math/MathContext.java
     public class MathContext
     {
         //  π = 22⁄7 = ​355⁄113.
@@ -44,9 +45,12 @@ namespace OsmPolygon.sunrisesunset
     }
 
 
+    // https://github.com/openjdk-mirror/jdk7u-jdk/blob/master/src/share/classes/java/math/BigDecimal.java
+    // https://github.com/Osinko/BigFloat/blob/master/src/BigFloat.cs
     // Implementation of BigDecimal 
     [Serializable]
-    public class BigFloat : IComparable, IComparable<BigFloat>, IEquatable<BigFloat>
+    public class BigFloat 
+        : IComparable, IComparable<BigFloat>, IEquatable<BigFloat>
     {
         private BigInteger numerator;
         private BigInteger denominator;
@@ -77,10 +81,135 @@ namespace OsmPolygon.sunrisesunset
             return (int)(double)this;
         }
 
+
+        public System.Numerics.BigInteger NumeratorValue
+        {
+            get
+            {
+                return this.numerator;
+            }
+        }
+
+        public System.Numerics.BigInteger DenominatorValue
+        {
+            get
+            {
+                return this.denominator;
+            }
+        }
+
+
         public string toPlainString()
         {
             return this.ToString();
         }
+        /*
+             // https://docs.oracle.com/javase/7/docs/api/java/math/RoundingMode.html
+    public enum RoundingMode
+    {
+       X CEILING // Rounding mode to round towards positive infinity.
+       X ,DOWN // Rounding mode to round towards zero.
+       X ,FLOOR // Rounding mode to round towards negative infinity.
+        ,HALF_DOWN // Rounding mode to round towards "nearest neighbor" unless both neighbors are equidistant, in which case round down.
+        ,HALF_EVEN // Rounding mode to round towards the "nearest neighbor" unless both neighbors are equidistant, in which case, round towards the even neighbor.
+        ,HALF_UP // Rounding mode to round towards "nearest neighbor" unless both neighbors are equidistant, in which case round up.
+       X ,UNNECESSARY //Rounding mode to assert that the requested operation has an exact result, hence no rounding is necessary.
+       X ,UP // Rounding mode to round away from zero.
+    }
+         */
+
+        public BigFloat Round2(RoundingMode roundingMode)
+        {
+            //get remainder. Over divisor see if it is > new BigFloat(0.5)
+            BigFloat value = BigFloat.Decimals(this);
+
+            int order = value.CompareTo(OneHalf);
+
+
+
+
+            if (order >= 0)
+                this.Ceil();
+            else
+                this.Floor();
+
+
+            if (roundingMode == RoundingMode.UP)
+            {
+                // Rounding mode to round away from zero.
+                if (value.Sign <= 0)
+                    this.Floor();
+                else
+                    this.Ceil();
+            }
+            else if (roundingMode == RoundingMode.CEILING)
+            {
+                // Towards +infinity
+                this.Ceil();
+            }
+            else if (roundingMode == RoundingMode.DOWN)
+            {
+                // Towards zero
+                if (value.Sign <= 0)
+                    this.Ceil();
+                else
+                    this.Floor();
+            }
+            else if (roundingMode == RoundingMode.FLOOR)
+            {
+                // Towards -infinity
+                this.Floor();
+            }
+            else if (roundingMode == RoundingMode.HALF_UP)
+            {
+                // HALF_UP: Mercantile rounding
+                // ,HALF_UP // Rounding mode to round towards "nearest neighbor" unless both neighbors are equidistant, 
+                //               in which case round up.
+                if (order >= 0)
+                    this.Ceil();
+                else
+                    this.Floor();
+            }
+            else if (roundingMode == RoundingMode.HALF_DOWN)
+            {
+                // Towards -infinity
+                // ,HALF_DOWN // Rounding mode to round towards "nearest neighbor" unless both neighbors are equidistant, 
+                //               in which case round down.
+                this.Round();
+            }
+            else if (roundingMode == RoundingMode.HALF_EVEN)
+            {
+                // HALF_EVEN: Banker's rounding
+            }
+
+
+
+
+
+
+
+
+
+            else if (roundingMode == RoundingMode.UNNECESSARY)
+            {  // Rounding prohibited
+                throw new ArithmeticException("Rounding necessary");
+            }
+            else
+            {
+            }
+
+
+
+
+
+            if (value.CompareTo(OneHalf) >= 0)
+                this.Ceil();
+            else
+                this.Floor();
+
+            return this;
+        }
+
 
         // https://www.tutorialspoint.com/java/math/bigdecimal_setscale_rm_roundingmode.htm
         public BigFloat setScale(int scale, RoundingMode mode)
@@ -88,7 +217,39 @@ namespace OsmPolygon.sunrisesunset
             // bg1 = new BigDecimal("123.12678");
             // bg2 = bg1.setScale(2, RoundingMode.FLOOR);
             // 123.12678 after changing the scale to 2 and rounding is 123.12
-            return this;
+
+            BigInteger bigPrecision = BigInteger.Pow(10, scale);
+            BigFloat newValue = new BigFloat(this);
+
+            newValue = newValue * bigPrecision;
+
+            // ,UP // Rounding mode to round away from zero.
+            //  CEILING // Rounding mode to round towards positive infinity.
+            // ,HALF_UP // Rounding mode to round towards "nearest neighbor" unless both neighbors are equidistant, in which case round up.
+
+            // ,DOWN // Rounding mode to round towards zero.
+            // ,FLOOR // Rounding mode to round towards negative infinity.
+            // ,HALF_DOWN // Rounding mode to round towards "nearest neighbor" unless both neighbors are equidistant, in which case round down.
+
+            // ,HALF_EVEN // Rounding mode to round towards the "nearest neighbor" unless both neighbors are equidistant, in which case, round towards the even neighbor.
+            // ,UNNECESSARY //Rounding mode to assert that the requested operation has an exact result, hence no rounding is necessary.
+
+            // HALF_EVEN: Banker's rounding
+            // HALF_UP: Mercantile rounding
+            if (mode == RoundingMode.CEILING || mode == RoundingMode.UP)
+            {
+                newValue = newValue.Ceil();
+            }
+            else if (mode == RoundingMode.FLOOR || mode == RoundingMode.DOWN || mode == RoundingMode.HALF_DOWN)
+            {
+                newValue = newValue.Floor();
+            }
+            else if (mode != RoundingMode.UNNECESSARY) // mode == RoundingMode.HALF_UP
+                newValue = newValue.Round();
+
+            newValue = newValue / bigPrecision;
+
+            return newValue;
         }
 
 
@@ -106,23 +267,45 @@ namespace OsmPolygon.sunrisesunset
             return ret;
         }
 
-            
+
+        private BigFloat Normalize()
+        {
+            if (this.denominator == 0)
+            {
+                throw new System.DivideByZeroException("In function " + nameof(Normalize));
+            }
+
+            System.Numerics.BigInteger n = System.Numerics.BigInteger.GreatestCommonDivisor(this.numerator, this.denominator);
+            this.numerator /= n; // lowest
+            this.denominator /= n; //    terms
+
+            if (this.denominator < 0)
+            {
+                // make denom positive
+                this.denominator = -this.denominator;
+                this.numerator = -this.numerator;
+            }
+
+            return this;
+        }
 
 
         public int Sign
         {
             get
             {
-                switch (numerator.Sign + denominator.Sign)
-                {
-                    case 2:
-                    case -2:
-                        return 1;
-                    case 0:
-                        return -1;
-                    default:
-                        return 0;
-                }
+                this.Normalize();
+
+                if (this.numerator == 0)
+                    return 0;
+
+                if (this.denominator == 0)
+                    throw new System.DivideByZeroException("In function " + nameof(Sign));
+
+                if (this.numerator > 0)
+                    return 1;
+
+                return -1;
             }
         }
 
@@ -317,10 +500,22 @@ namespace OsmPolygon.sunrisesunset
         }
         public BigFloat Floor()
         {
+            this.numerator = 5;
+            this.denominator = 3;
+
+            var bi = BigInteger.Remainder(numerator, denominator);
+
+
+
+            System.Console.WriteLine(bi);
+
+
+            /*
             if (numerator < 0)
                 numerator += denominator - BigInteger.Remainder(numerator, denominator);
             else
                 numerator -= BigInteger.Remainder(numerator, denominator);
+            */
 
             Factor();
             return this;
@@ -394,7 +589,7 @@ namespace OsmPolygon.sunrisesunset
                 return result.ToString();
 
 
-            BigInteger decimals = (numerator * BigInteger.Pow(10, precision)) / denominator;
+            BigInteger decimals = BigInteger.Abs((numerator * BigInteger.Pow(10, precision)) / denominator);
 
             if (decimals == 0 && trailingZeros)
                 return result + ".0";
@@ -410,12 +605,14 @@ namespace OsmPolygon.sunrisesunset
             }
 
             if (trailingZeros)
-                return result + "." + new string(sb.ToString().Reverse().ToArray());
+                // return result + "." + new string(sb.ToString().Reverse().ToArray());
+                return (Sign < 0 ? "-" : "") + result + "." + new string(sb.ToString().Reverse().ToArray());
             else
-                return result + "." + new string(sb.ToString().Reverse().ToArray()).TrimEnd(new char[] { '0' });
-
-
+                // return result + "." + new string(sb.ToString().Reverse().ToArray()).TrimEnd(new char[] { '0' });
+                return (Sign < 0 ? "-" : "") + result + "." + new string(sb.ToString().Reverse().ToArray()).TrimEnd(new char[] { '0' });
         }
+
+
         public string ToMixString()
         {
             Factor();
@@ -562,6 +759,25 @@ namespace OsmPolygon.sunrisesunset
         {
             return (new BigFloat(value)).Round();
         }
+
+
+        // =ROUND(num*(100/multipleof);0)/(100/multipleof) // multipleof = 1, 3, 5 etc.
+        // =ROUND(num*(100/multipleof);0)/(100/multipleof) // multipleof = 1, 3, 5 etc.
+        public static BigFloat Round(BigFloat value, int scale)
+        {
+            BigInteger bigPrecision = BigInteger.Pow(10, scale);
+            BigFloat newValue = new BigFloat(value);
+
+            newValue = newValue * bigPrecision;
+            newValue = newValue.Round();
+            newValue = newValue / bigPrecision;
+
+            return newValue;
+        }
+
+
+
+
         public static BigFloat Parse(string value)
         {
             if (value == null)
