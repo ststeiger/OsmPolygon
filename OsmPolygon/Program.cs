@@ -74,7 +74,7 @@ namespace OsmPolygon
 
         static void Main(string[] args)
         {
-
+            RationalMath.MyRational.Test();
             FixedMath.FixedDecimalTests.TestMe(123.456M);
 
             // OsmPolygon.Concave.COORDS.TestCoordinateConversion.Test(); // Bad 

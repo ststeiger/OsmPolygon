@@ -1,72 +1,10 @@
 ﻿
 using OsmPolygon.sunrisesunset;
 
+
 namespace OsmPolygon.FixedMath 
 {
 
-
-    public class LongMath
-    {
-        // Use Euclid's algorithm to calculate the
-        // greatest common divisor (GCD) of two numbers.
-        public static long GCD(long a, long b)
-        {
-            a = System.Math.Abs(a);
-            b = System.Math.Abs(b);
-
-            // Pull out remainders.
-            for (; ; )
-            {
-                long remainder = a % b;
-                if (remainder == 0)
-                    return b;
-
-                a = b;
-                b = remainder;
-            };
-        }
-
-
-        // Return the least common multiple
-        // (LCM) of two numbers.
-        public static long LCM(long a, long b)
-        {
-            return a * b / GCD(a, b);
-        }
-
-    }
-
-
-    public class BigMath
-    {
-
-        // Use Euclid's algorithm to calculate the
-        // greatest common divisor (GCD) of two numbers.
-        private static System.Numerics.BigInteger GCD(System.Numerics.BigInteger a, System.Numerics.BigInteger b)
-        {
-            a = System.Numerics.BigInteger.Abs(a);
-            b = System.Numerics.BigInteger.Abs(b);
-
-            // Pull out remainders.
-            for (; ; )
-            {
-                System.Numerics.BigInteger remainder = a % b;
-                if (remainder == System.Numerics.BigInteger.Zero)
-                    return b;
-
-                a = b;
-                b = remainder;
-            };
-        }
-
-
-        // Return the least common multiple (LCM) of two numbers.
-        private static System.Numerics.BigInteger LCM(System.Numerics.BigInteger a, System.Numerics.BigInteger b)
-        {
-            return a * b / GCD(a, b);
-        }
-
-    }
 
     public class FixedDecimalTests
     {
@@ -78,21 +16,13 @@ namespace OsmPolygon.FixedMath
             System.Numerics.BigInteger ten = new System.Numerics.BigInteger(10);
 
             BigFloat numeratorF = new BigFloat(52163, 16604);
-
-            numeratorF = new BigFloat(-1, 2);
-
             numeratorF = numeratorF.Floor();
             System.Console.WriteLine(numeratorF.toPlainString());
-
-
 
             BigFloat value = BigFloat.Decimals(numeratorF);
             System.Console.WriteLine(value.toPlainString());
 
             // if (value.CompareTo(BigFloat.OneHalf) >= 0)
-
-
-
 
             var numeratorG = numeratorF.Floor();
 
@@ -101,24 +31,18 @@ namespace OsmPolygon.FixedMath
             System.Console.WriteLine(numeratorF.toPlainString());
             System.Console.WriteLine(numeratorG.toPlainString());
 
-
-
             System.Numerics.BigInteger n = numeratorF.NumeratorValue;
             System.Numerics.BigInteger d = numeratorF.DenominatorValue;
 
             BigFloat sum = numeratorF * 3;
 
-
-
-
             System.Console.WriteLine(sum);
             System.Console.WriteLine(n);
             System.Console.WriteLine(d);
-
         }
 
 
-            public static void Test()
+        public static void Test()
         {
             FixedDecimal a = new FixedDecimal(123);
             FixedDecimal b = new FixedDecimal(123);
@@ -126,6 +50,7 @@ namespace OsmPolygon.FixedMath
             int d = (int)c;
             System.Console.WriteLine(c);
         }
+
 
     }
 

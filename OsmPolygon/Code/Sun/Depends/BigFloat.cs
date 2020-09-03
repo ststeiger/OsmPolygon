@@ -791,13 +791,13 @@ namespace OsmPolygon.sunrisesunset
             if (pos < 0)
             {
                 //no decimal point
-                BigInteger numerator = BigInteger.Parse(value);
+                BigInteger numerator = BigInteger.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
                 return (new BigFloat(numerator)).Factor();
             }
             else
             {
                 //decimal point (length - pos - 1)
-                BigInteger numerator = BigInteger.Parse(value);
+                BigInteger numerator = BigInteger.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
                 BigInteger denominator = BigInteger.Pow(10, value.Length - pos);
 
                 return (new BigFloat(numerator, denominator)).Factor();

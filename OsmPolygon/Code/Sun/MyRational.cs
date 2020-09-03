@@ -1,87 +1,330 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace OsmPolygon.Code.Sun
+﻿
+namespace OsmPolygon.RationalMath
 {
-    class MyRational
+
+
+    public class MyRational
     {
 
-        public System.Numerics.BigInteger Numerator;
-        public System.Numerics.BigInteger Denominator; // denom > 0, fraction is reduced to lowest terms
+        public readonly System.Numerics.BigInteger Numerator;
+        public readonly System.Numerics.BigInteger Denominator;
 
-        // Create a fraction given numerator and denominator.
-        public MyRational(System.Numerics.BigInteger numerator, System.Numerics.BigInteger denominator)
+
+        public static void Test()
         {
-            Numerator = numerator;
-            Denominator = denominator;
-            Normalize();
+            double gold = (1.0d + System.Math.Sqrt(5.0d)) / 2.0d;
+            MyRational golden = new MyRational(gold);
+
+            MyRational a = new MyRational(3);
+            MyRational b = new MyRational(5);
+
+
+
+            if ( a > b)
+                System.Console.WriteLine("true");
+            else
+                System.Console.WriteLine("false");
+
+            MyRational num = new MyRational(4, 2);
+            // MyRational sqrt = MyRational.SquareRoot(num, new MyRational(1,10000));
+            MyRational rt = RootN(num, 3, new MyRational(1, 10000));
+
+
+            MyRational negativeNegative = new MyRational(-5, -3);
+            MyRational negativePositive = new MyRational(-5, 3);
+            MyRational positiveNegative = new MyRational(5, -3);
+
+            negativeNegative = negativeNegative.Pow(-3);
+            negativePositive = negativePositive.Pow(-3);
+            positiveNegative = positiveNegative.Pow(-3);
+
+            System.Console.WriteLine(negativeNegative);
+            System.Console.WriteLine(negativePositive);
+            System.Console.WriteLine(positiveNegative);
+
+
+            MyRational a53 = new MyRational(5, 3);
+            MyRational a27 = new MyRational(2, 7);
+
+            MyRational div = a53.Divide(a27);
+            MyRational rem = a53.Mod(a27);
+            MyRational dec = div.Decimals();
+
+            System.Console.WriteLine(golden);
+            System.Console.WriteLine(div);
+            System.Console.WriteLine(rem);
+            System.Console.WriteLine(dec);
         }
-
-
-        public MyRational(System.Numerics.BigInteger numerator)
-            :this(numerator,1)
-        { }
 
 
         // Use Euclid's algorithm to calculate the
         // greatest common divisor (GCD) of two numbers.
         public static System.Numerics.BigInteger GCD(System.Numerics.BigInteger a, System.Numerics.BigInteger b)
         {
-            a = System.Numerics.BigInteger.Abs(a);
-            b = System.Numerics.BigInteger.Abs(b);
+            System.Numerics.BigInteger divisor = System.Numerics.BigInteger.Abs(a);
+            System.Numerics.BigInteger remainder = System.Numerics.BigInteger.Abs(b);
 
-            System.Numerics.BigInteger remainder = 0;
-            while ((remainder = a % b) == 0)
+            while (remainder != System.Numerics.BigInteger.Zero)
             {
-                a = b;
-                b = remainder;
-            }
+                System.Numerics.BigInteger oldRemainder = remainder;
+                remainder = divisor % remainder;
+                divisor = oldRemainder;
+            } // Whend
 
-            return b;
+            return divisor;
         }
 
 
-        // Return the least common multiple
-        // (LCM) of two numbers.
+        // Return the least common multiple (LCM) of two numbers.
         public static System.Numerics.BigInteger LCM(System.Numerics.BigInteger a, System.Numerics.BigInteger b)
         {
             return a * b / GCD(a, b);
         }
 
-        private MyRational Normalize()
-        {
-            if (this.Denominator == 0)
-            { 
-                throw new System.DivideByZeroException("In function " + nameof(Normalize));
-            }
 
-            System.Numerics.BigInteger n = GCD(this.Numerator, this.Denominator);
-            this.Numerator /= n;         // lowest
-            this.Denominator /= n;       //    terms
-            if (this.Denominator < 0)
-            { 
+        // Use Euclid's algorithm to calculate the
+        // greatest common divisor (GCD) of two numbers.
+        public static long GCD(long a, long b)
+        {
+            long divisor = System.Math.Abs(a);
+            long remainder = System.Math.Abs(b);
+
+            while (remainder != System.Numerics.BigInteger.Zero)
+            {
+                long oldRemainder = remainder;
+                remainder = divisor % remainder;
+                divisor = oldRemainder;
+            } // Whend
+
+            return divisor;
+        }
+
+        // Return the least common multiple (LCM) of two numbers.
+        public static long LCM(long a, long b)
+        {
+            return a * b / GCD(a, b);
+        }
+
+
+        // Use Euclid's algorithm to calculate the
+        // greatest common divisor (GCD) of two numbers.
+        public static int GCD(int a, int b)
+        {
+            int divisor = System.Math.Abs(a);
+            int remainder = System.Math.Abs(b);
+
+            while (remainder != System.Numerics.BigInteger.Zero)
+            {
+                int oldRemainder = remainder;
+                remainder = divisor % remainder;
+                divisor = oldRemainder;
+            } // Whend
+
+            return divisor;
+        }
+
+
+        // Return the least common multiple (LCM) of two numbers.
+        public static int LCM(int a, int b)
+        {
+            return a * b / GCD(a, b);
+        }
+
+
+        private static void Normalize(out System.Numerics.BigInteger numerator, out System.Numerics.BigInteger denominator)
+        {
+            // System.Numerics.BigInteger.GreatestCommonDivisor
+            System.Numerics.BigInteger n = GCD(numerator, denominator);
+            numerator /= n;         // lowest
+            denominator /= n;       //    terms
+            if (denominator < 0)
+            {
                 // make denom positive
-                this.Denominator = -this.Denominator;
-                this.Numerator = -this.Numerator;
+                denominator = -denominator;
+                numerator = -numerator;
             }
 
-            return this;
         }
 
-        /**
-         * Return a number that is positive, zero or negative, respectively, if
-         *   the value of this Rational is bigger than f,
-         *   the values of this Rational and f are equal or
-         *   the value of this Rational is smaller than f.
-         */
-        public System.Numerics.BigInteger CompareTo(MyRational other)
+
+
+        // https://www.quora.com/What-is-the-best-rational-approximation-of-pi-Let-best-be-the-difference-between-the-number-of-digits-used-to-represent-the-rational-and-the-number-of-accurate-digits-in-the-decimal-expansion?share=1
+        // http://qin.laya.com/tech_projects_approxpi.html
+        // Num./Den. = Result (Accuracy )
+        // 355/ 113 = 3.14159292035398230088495575221238938053 (-0.00000026676418906242231236893288649634)
+        // public static readonly MyRational PI = new MyRational(355, 113);
+
+        // 52163/16604 = 3.14159238737653577451216574319441098530 ( 0.00000026621325746395047764008509189889)
+        // public static readonly MyRational PI = new MyRational(52163, 16604);
+
+        // 2646693125139304345/ 842468587426513207 = 3.14159265358979323846264338327950288418 ( 0.00000000000000000000000000000000000001)
+        public static readonly MyRational PI = new MyRational(2646693125139304345, 842468587426513207);
+
+        // https://www.tandfonline.com/doi/full/10.1080/0020739X.2017.1352043
+        // which evaluates to a decimal giving correctly the first 20 digits of e:
+        public static readonly MyRational e = new MyRational(System.Numerics.BigInteger.Parse("611070150698522592097"), System.Numerics.BigInteger.Parse("224800145555521536000"));
+        // http://www.acsu.buffalo.edu/~adamcunn/spring2017/Week3Notebook.html
+        public static readonly MyRational e_Exact = new MyRational(System.Numerics.BigInteger.Parse("337310723185584470837549"), System.Numerics.BigInteger.Parse("124089680346647887872000"));
+
+
+        // https://www.theproblemsite.com/ask/2017/09/approximation-for-the-golden-ratio
+        // Golden ratio 1.6180
+        // (1+sqrt(5))/2 ==> accurate to 0.00000000001 ? 
+        // public static readonly MyRational GoldenRatio_COMPUTED = new MyRational(161803398874989, 100000000000000);
+        public static readonly MyRational GoldenRatio = new MyRational(317811, 196418);
+
+        // 299'792'458 m/s
+        public static readonly MyRational SpeedOfLightInVacuum = new MyRational(299792458, 1);
+        // 1 Meter = 1/299'792'458  m
+        public static readonly MyRational LightSecondsPerMeter = new MyRational(1, 299792458);
+
+        public static readonly MyRational Zero = new MyRational(0, 1);
+        public static readonly MyRational One = new MyRational(1, 1);
+        public static readonly MyRational Ten = new MyRational(10, 1);
+        public static readonly MyRational Thousand = new MyRational(1000, 1);
+
+        public static readonly MyRational OneHalf = new MyRational(1, 2);
+
+
+
+
+        // Plack constant
+        // Avogardo
+        // light speed
+        // gravitational constant
+        // bolthmann constant
+        // square root two
+
+
+        public static MyRational Parse(string value)
         {
-            if (other == null)
-                throw new ArgumentNullException("other");
+            if (value == null)
+                throw new System.ArgumentNullException("value");
 
-            return this.Numerator * other.Denominator - this.Denominator * other.Numerator; //numerator of this - f
+            value.Trim();
+            value = value.Replace(",", "");
+            int pos = value.IndexOf('.');
+            value = value.Replace(".", "");
+
+            if (pos < 0)
+            {
+                // no decimal point
+                System.Numerics.BigInteger numerator = System.Numerics.BigInteger.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
+                return new MyRational(numerator);
+            }
+            else
+            {
+                // decimal point (length - pos - 1)
+                System.Numerics.BigInteger numerator = System.Numerics.BigInteger.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
+                System.Numerics.BigInteger denominator = System.Numerics.BigInteger.Pow(10, value.Length - pos);
+
+                return new MyRational(numerator, denominator);
+            }
         }
+
+
+
+        public MyRational(string number)
+        {
+            MyRational r = Parse(number);
+            this.Numerator = r.Numerator;
+            this.Denominator = r.Denominator;
+        }
+
+        public MyRational(float value) : this(value.ToString("N99", System.Globalization.CultureInfo.InvariantCulture))
+        { }
+
+        public MyRational(double value) : this(value.ToString("N99", System.Globalization.CultureInfo.InvariantCulture))
+        { }
+
+        public MyRational(decimal value) : this(value.ToString("N99", System.Globalization.CultureInfo.InvariantCulture))
+        { }
+
+
+        // Create a fraction given numerator and denominator.
+        public MyRational(System.Numerics.BigInteger numerator, System.Numerics.BigInteger denominator)
+        {
+            if (denominator == 0)
+            {
+                throw new System.ArgumentException("Denominator cannot be ZERO.");
+            }
+
+            Normalize(out numerator, out denominator);
+
+            this.Numerator = numerator;
+            this.Denominator = denominator;
+        }
+
+
+        public MyRational(System.Numerics.BigInteger numerator)
+            : this(numerator, System.Numerics.BigInteger.One)
+        { }
+
+        public MyRational(int numerator)
+            : this(new System.Numerics.BigInteger(numerator), System.Numerics.BigInteger.One)
+        { }
+
+        public MyRational(uint numerator)
+            : this(new System.Numerics.BigInteger(numerator), System.Numerics.BigInteger.One)
+        { }
+
+        public MyRational(long numerator)
+            : this(new System.Numerics.BigInteger(numerator), System.Numerics.BigInteger.One)
+        { }
+
+        public MyRational(ulong numerator)
+            : this(new System.Numerics.BigInteger(numerator), System.Numerics.BigInteger.One)
+        { }
+
+
+
+        private static int MyCompare(MyRational a, MyRational b)
+        {
+            if (a is null && b is null)
+                return 0;
+
+            if (a is null)
+                return -1;
+
+            if (b is null)
+                return 1;
+
+            MyRational delta = a.Subtract(b);
+            return delta.Sign;
+        }
+
+
+        /*
+        // Return a number that is positive, zero or negative, respectively, if
+        // the value of this Rational is bigger than f ==> +1,
+        // the values of this Rational and f are equal or ==> 0
+        // the value of this Rational is smaller than f ==> -1
+        public int CompareTo(MyRational other)
+        {
+
+
+            if (other == null)
+                throw new System.ArgumentNullException("other");
+
+            // Why ? Correct ? 
+
+            //// Make copies
+            //System.Numerics.BigInteger one = this.Numerator;
+            //System.Numerics.BigInteger two = other.Numerator;
+
+            //// cross multiply
+            //one *= other.Denominator;
+            //two *= this.Denominator;
+
+            ////test
+            //return System.Numerics.BigInteger.Compare(one, two);
+
+            MyRational delta = this.Subtract(other);
+            return delta.Sign;
+        }
+
+
+
 
         public System.Numerics.BigInteger CompareTo(object other)
         {
@@ -90,11 +333,12 @@ namespace OsmPolygon.Code.Sun
 
             return CompareTo((MyRational)other);
         }
+        */
 
         public bool Equals(MyRational other)
         {
             if (other == null)
-                throw new ArgumentNullException("other");
+                throw new System.ArgumentNullException("other");
 
             return this.Numerator == other.Numerator && this.Denominator == other.Denominator;
         }
@@ -103,7 +347,7 @@ namespace OsmPolygon.Code.Sun
         {
             if (!(other is MyRational))
                 throw new System.ArgumentException("other is not a MyRational");
-            
+
             MyRational rat = (MyRational)other;
             return this.Equals(rat);
         }
@@ -114,23 +358,22 @@ namespace OsmPolygon.Code.Sun
         }
 
 
-        //// ToDecimal chunk
-        ///** Return a decimal approximation to the fraction. */
-        //public decimal ToDecimal()
-        //{
-        //    return ((decimal)this.Numerator) / this.Denominator;
-        //}
+        // Return a decimal approximation to the fraction.
+        public decimal ToDecimal()
+        {
+            return (decimal)this.Numerator / (decimal)this.Denominator;
+        }
 
 
-        public System.Numerics.BigInteger Sign
+        public int Sign
         {
             get
             {
-                this.Normalize();
+                // the fraction is normalized at this point ! 
                 if (this.Numerator == 0)
                     return 0;
 
-                if(this.Denominator == 0)
+                if (this.Denominator == 0)
                     throw new System.DivideByZeroException("In function " + nameof(Sign));
 
                 if (this.Numerator > 0)
@@ -141,130 +384,169 @@ namespace OsmPolygon.Code.Sun
         }
 
 
-        public static MyRational Parse(string value)
-        {
-            if (value == null)
-                throw new ArgumentNullException("value");
 
-            value.Trim();
-            value = value.Replace(",", "");
-            int pos = value.IndexOf('.');
-            value = value.Replace(".", "");
-
-            if (pos < 0)
-            {
-                //no decimal poSystem.Numerics.BigInteger
-                System.Numerics.BigInteger numerator = System.Numerics.BigInteger.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
-                return new MyRational(numerator);
-            }
-            else
-            {
-                //decimal poSystem.Numerics.BigInteger (length - pos - 1)
-                System.Numerics.BigInteger numerator = System.Numerics.BigInteger.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
-                System.Numerics.BigInteger denominator = System.Numerics.BigInteger.Pow(10, value.Length - pos);
-
-                return new MyRational(numerator, denominator);
-            }
-        }
-
-
-        // Negate chunk
-        /** Return a new Rational which is this Rational negated.*/
         public MyRational Negate()
         {
-            this.Numerator *= -1;
-            this.Normalize();
-            return this;
-
-            // return new MyRational(-this.Numerator, this.Denominator);
+            return new MyRational(-this.Numerator, this.Denominator);
         }
 
-        // Reciprocal chunk
-        /** Return a new Rational which is the reciprocal of this Rational.*/
-        //public MyRational Reciprocal()
-        //{
-        //    return new MyRational(this.Denominator, this.Numerator);
-        //}
 
+        // Reciprocal
         public MyRational Inverse()
         {
-            System.Numerics.BigInteger temp = this.Numerator;
-            this.Numerator = this.Denominator;
-            this.Denominator = temp;
-
-            return this;
+            return new MyRational(this.Denominator, this.Numerator);
         }
 
 
         public MyRational Increment()
         {
-            this.Numerator += this.Denominator;
-            return this;
+            return new MyRational(this.Numerator + this.Denominator, this.Denominator);
         }
+
+
         public MyRational Decrement()
         {
-            this.Numerator -= this.Denominator;
-            return this;
+            return new MyRational(this.Numerator - this.Denominator, this.Denominator);
         }
+
 
         public MyRational Abs()
         {
-            if (this.Numerator < 0)
-                this.Numerator *= -1;
+            System.Numerics.BigInteger a = System.Numerics.BigInteger.Abs(this.Numerator);
+            System.Numerics.BigInteger b = System.Numerics.BigInteger.Abs(this.Denominator);
 
-            if (this.Denominator < 0)
-                this.Denominator *= -1;
-
-
-
-            return this;
+            return new MyRational(a, b);
         }
 
 
-
-        // Add chunk
-        /** Return a new Rational which is the sum of this Rational and f. */
-        public MyRational Add(MyRational f)
+        // thisᵉˣᵖᵒⁿᵉⁿᵗ = Numeratorᵉˣᵖᵒⁿᵉⁿᵗ / Denominatorᵉˣᵖᵒⁿᵉⁿᵗ
+        public MyRational Pow(int exponent)
         {
-            return new MyRational(this.Numerator * f.Denominator + this.Denominator * f.Numerator, this.Denominator * f.Denominator);
+            if (exponent < 0)
+            {
+                exponent = -exponent;
+
+                MyRational dividend = new MyRational(1, System.Numerics.BigInteger.Pow(this.Numerator, exponent));
+                MyRational divisor = new MyRational(1, System.Numerics.BigInteger.Pow(this.Denominator, exponent));
+                MyRational quotient = dividend.Divide(divisor);
+                return quotient;
+            }
+
+            return new MyRational(
+                  System.Numerics.BigInteger.Pow(this.Numerator, exponent)
+                , System.Numerics.BigInteger.Pow(this.Denominator, exponent)
+            );
         }
 
-        /** Return a new Rational which is the difference of this Rational and f.*/
-        public MyRational Subtract(MyRational f)
+
+        public static MyRational SquareRoot(MyRational n, MyRational epsilon)
         {
-            return new MyRational(this.Numerator * f.Denominator - this.Denominator * f.Numerator, this.Denominator * f.Denominator);
-        }
+            // Assuming the sqrt of n as n only 
+            MyRational x = n;
 
-        // Multiply chunk
-        /** Return a new Rational which is the product of this Rational and f. */
-        public MyRational Multiply(MyRational f)
-        {                           // end Multiply heading chunk
-            return new MyRational(this.Numerator * f.Numerator, this.Denominator * f.Denominator);
-        }
-        // Divide chunk
-        /** Return a new Rational which is the quotient of this Rational and f. */
-        public MyRational Divide(MyRational f)
+            // The closed guess will be stored in the root 
+            MyRational root;
+
+            // To count the number of iterations 
+            int count = 0;
+
+            while (true)
+            {
+                count++;
+
+                // Calculate more closed x 
+                root = MyRational.OneHalf * (x + (n / x));
+
+                // Check for closeness 
+                if ((root - x).Abs() < epsilon)
+                    break;
+
+                // Update root 
+                x = root;
+            } // Whend 
+
+            return root;
+        } // End Function SquareRoot 
+
+
+        // root(A, n)
+        // https://en.wikipedia.org/wiki/Nth_root#Using_Newton.27s_method
+        public static MyRational RootN(MyRational n, int exponent, MyRational epsilon)
         {
-            return new MyRational(this.Numerator * f.Denominator, this.Denominator * f.Numerator);
+            // Assuming the sqrt of n as n only 
+            MyRational x = n;
+
+            // The closed guess will be stored in the root 
+            MyRational root;
+
+            MyRational one_over_exponent = new MyRational(1, exponent);
+            MyRational exponent_minus_one = new MyRational(exponent - 1);
+
+            // To count the number of iterations 
+            int count = 0;
+            while (true)
+            {
+                count++;
+
+                // Calculate more closed x 
+                root = one_over_exponent * (exponent_minus_one * x + (n / x));
+
+                // Check for closeness 
+                if ((root - x).Abs() < epsilon)
+                    break;
+
+                // Update root 
+                x = root;
+            } // Whend 
+
+            return root;
+        } // End Function RootN 
+
+
+        // r^n = x ==> r = root(x, n) = root(this, exponent)
+        public MyRational Root(int exponent)
+        {
+            System.Numerics.BigInteger.Pow(this.Numerator, -exponent);
+            System.Numerics.BigInteger.Pow(this.Denominator, -exponent);
+
+            MyRational xk = null;
+
+            MyRational oneOverN = new MyRational(1, exponent);
+
+
+
+
+            return new MyRational(0, 0);
         }
 
 
 
-        //public System.Numerics.BigInteger Remainder
-        //{
-        //    get
-        //    {
-        //        return this.Numerator % this.Denominator;
-        //    }
-        //}
+        // this + other 
+        public MyRational Add(MyRational other)
+        {
+            return new MyRational(this.Numerator * other.Denominator + this.Denominator * other.Numerator, this.Denominator * other.Denominator);
+        }
 
-        //public MyRational Decimals()
-        //{
-        //    return new MyRational(this.Remainder, this.Denominator);
-        //}
+        // this - other
+        public MyRational Subtract(MyRational other)
+        {
+            return new MyRational(this.Numerator * other.Denominator - this.Denominator * other.Numerator, this.Denominator * other.Denominator);
+        }
+
+        // this * other
+        public MyRational Multiply(MyRational other)
+        {
+            return new MyRational(this.Numerator * other.Numerator, this.Denominator * other.Denominator);
+        }
+
+        // this/other
+        public MyRational Divide(MyRational other)
+        {
+            return new MyRational(this.Numerator * other.Denominator, this.Denominator * other.Numerator);
+        }
 
 
-        // 5/3 *2/7 = 35/6 = 5 r 5
+        // this \ other = (5/3)\(2/7) = 5 rem 5/21 ==> 5
         public MyRational Div(MyRational other)
         {
             System.Numerics.BigInteger num = this.Numerator * other.Denominator;
@@ -274,25 +556,167 @@ namespace OsmPolygon.Code.Sun
         }
 
 
-
-
-        // The 'modulus' operation is defined as:
-        // a % n ==> a - (a / n) * n
-        // 5/3 *2/7 = 35/6 = 5 r 5
+        // this % other = (5/3)%(2/7) = 5 rem 5/21 ==> 5/21 = 0.238095238
         // this % other ==> this - (this / other) * other
-        public MyRational Remainder(MyRational other)
+        // WARNING: This is NOT the decimal part when the denominator is not 1 ! 
+        public MyRational Mod(MyRational other)
         {
-            // this / other
+            // The 'modulus' operation is defined as: a % n ==> a - (a / n) * n
+            MyRational div = this.Div(other);
+            MyRational divXother = div.Multiply(other);
+            MyRational rem = this.Subtract(divXother);
+            return rem;
+        }
 
-            var a_n_o = this.Divide(other).Multiply(other);
-            
-            
 
-            var mr = this.Subtract();
+        // (5/3) / (2/7) = 35/6 = 5 5/6 = 5.833333333 ==> 0.833333333 aka 5/6
+        // this - (this div 1) = 35/6-((35/6)\1) = 5/6
+        public MyRational Decimals()
+        {
+            MyRational div = this.Div(MyRational.One);
+            MyRational res = this.Subtract(div);
+
+            return res;
+        }
 
 
-            return null;
 
+        public static MyRational operator ~(MyRational value)
+        {
+            // Correct ?
+            return value.Inverse();
+        }
+
+        public static MyRational operator -(MyRational value)
+        {
+            return value.Negate();
+        }
+        public static MyRational operator -(MyRational left, MyRational right)
+        {
+            return left.Subtract(right);
+        }
+
+
+        public static MyRational operator --(MyRational value)
+        {
+            return value.Decrement();
+        }
+
+        public static MyRational operator +(MyRational left, MyRational right)
+        {
+            return left.Add(right);
+        }
+        public static MyRational operator +(MyRational value)
+        {
+            // return (new MyRational(value)).Abs();
+            return value;
+        }
+        public static MyRational operator ++(MyRational value)
+        {
+            return value.Increment();
+        }
+
+        public static MyRational operator %(MyRational left, MyRational right)
+        {
+            return left.Mod(right);
+        }
+        public static MyRational operator *(MyRational left, MyRational right)
+        {
+            return left.Multiply(right);
+        }
+        public static MyRational operator /(MyRational left, MyRational right)
+        {
+            return left.Divide(right);
+        }
+
+
+        public static bool operator !=(MyRational left, MyRational right)
+        {
+            return MyCompare(left, right) != 0;
+        }
+        public static bool operator ==(MyRational left, MyRational right)
+        {
+            return MyCompare(left, right) == 0;
+        }
+
+
+        public static bool operator <(MyRational left, MyRational right)
+        {
+            return MyCompare(left, right) < 0;
+        }
+        public static bool operator <=(MyRational left, MyRational right)
+        {
+            return MyCompare(left, right) <= 0;
+        }
+        public static bool operator >(MyRational left, MyRational right)
+        {
+            return MyCompare(left, right) > 0;
+        }
+        public static bool operator >=(MyRational left, MyRational right)
+        {
+            return MyCompare(left, right) >= 0;
+        }
+
+
+        public static bool operator true(MyRational value)
+        {
+            return value.Numerator != System.Numerics.BigInteger.Zero;
+        }
+        public static bool operator false(MyRational value)
+        {
+            return value.Numerator == System.Numerics.BigInteger.Zero;
+        }
+
+
+        public string ToString(int precision, bool trailingZeros = false)
+        {
+            System.Numerics.BigInteger remainder;
+            System.Numerics.BigInteger result = System.Numerics.BigInteger.DivRem(this.Numerator, this.Denominator, out remainder);
+
+            if (remainder == 0 && trailingZeros)
+                return result + ".0";
+            else if (remainder == 0)
+                return result.ToString();
+
+            System.Numerics.BigInteger decimals = System.Numerics.BigInteger.Abs((this.Numerator * System.Numerics.BigInteger.Pow(10, precision)) / this.Denominator);
+
+            if (decimals == 0 && trailingZeros)
+                return result + ".0";
+            else if (decimals == 0)
+                return result.ToString();
+
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+            while (precision-- > 0 && decimals > 0)
+            {
+                sb.Append(decimals % 10);
+                decimals /= 10;
+            }
+
+            if (trailingZeros)
+            {
+                char[] ca = sb.ToString().ToCharArray();
+                System.Array.Reverse(ca);
+
+                // return result + "." + new string(sb.ToString().Reverse().ToArray());
+                return (Sign < 0 ? "-" : "") + result + "." + new string(ca);
+            }
+
+            else
+            {
+                char[] ca = sb.ToString().ToCharArray();
+                System.Array.Reverse(ca);
+
+                return (Sign < 0 ? "-" : "") + result + "." + new string(ca).TrimEnd(new char[] { '0' });
+            }
+                
+        }
+
+
+        public override string ToString()
+        {
+            // default precision = 100
+            return ToString(100);
         }
 
 
