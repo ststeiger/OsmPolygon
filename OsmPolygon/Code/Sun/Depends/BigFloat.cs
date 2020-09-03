@@ -676,7 +676,8 @@ namespace OsmPolygon.sunrisesunset
         {
             return base.GetHashCode();
         }
-
+        
+        
         //static methods
         public static bool Equals(object left, object right)
         {
