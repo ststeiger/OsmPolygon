@@ -160,10 +160,38 @@ namespace OsmPolygon
                 return  omg + temp;
             }
 
+            
+            
+
+            // https://functions.wolfram.com/ElementaryFunctions/ArcTan/10/
+            // https://rosettacode.org/wiki/Continued_fraction#C.2B.2B
+            // https://rosettacode.org/wiki/Continued_fraction#C.23
+            // https://en.wikipedia.org/wiki/Continued_fraction
+            // https://en.wikipedia.org/wiki/Inverse_trigonometric_functions#Continued_fractions_for_arctangent
+            static double NewArcTan(double z, int maxLevel)
+            {
+                double temp = 0.0;
+                for (int n = maxLevel; n >= 1; n--)
+                {
+                    // 3 ==> 5, 2.25
+                    // 2 ==> 3, 1
+                    // 1 ==> 1, 0.25
+                    int a0 = 666;
+                    int Ai = n > 0 ? (2 * n - 1) : a0;
+                    double Bi = n*n * z*z;
+                    
+                    temp = Bi / (Ai + temp);
+                }
+                
+                // 0, 0.5
+                return z / temp;
+            }
+
+            
 
             public static void Test()
             {
-                double at = ArcTan(0.5, 300); // 0,463647609
+                double at = NewArcTan(0.5, 300); // 0,463647609
                 System.Console.WriteLine(at);
 
 
