@@ -1,4 +1,5 @@
 ﻿
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 
 namespace OsmPolygon.RationalMath
@@ -17,23 +18,38 @@ namespace OsmPolygon.RationalMath
             double gold = (1.0d + System.Math.Sqrt(5.0d)) / 2.0d;
             MyRational golden = new MyRational(gold);
 
+
+
+            MyRational rat = new MyRational("0.5");
+            MyRational ata = rat.Arctan();
+            System.Console.WriteLine(ata);
+
+            // System.Console.WriteLine(ata); // {0.4621615816987241548078304229099378605228827730020354712665967136200503624217050367267952488982260125}
+            // arctan(0.5) = 0,463647609
+
+
+            MyRational reciprocalValue = new MyRational(5, 3).Pow(-1);
+            System.Console.WriteLine(reciprocalValue);
+
+
+
             MyRational a = new MyRational(3);
             MyRational b = new MyRational(5);
 
 
 
-            if ( a > b)
+            if (a > b)
                 System.Console.WriteLine("true");
             else
                 System.Console.WriteLine("false");
 
             MyRational num = new MyRational(4, 2);
-            MyRational sqrt = MyRational.Sqrt(num, new MyRational(1,10000));
+            MyRational sqrt = MyRational.Sqrt(num, new MyRational(1, 10000));
             MyRational rt = Root(num, 4, new MyRational(1, 10000));
 
             string mix = rt.ToMixString();
             System.Console.WriteLine(mix);
-            
+
             MyRational negativeNegative = new MyRational(-5, -3);
             MyRational negativePositive = new MyRational(-5, 3);
             MyRational positiveNegative = new MyRational(5, -3);
@@ -166,11 +182,12 @@ namespace OsmPolygon.RationalMath
         public static readonly MyRational PiSquared = new MyRational(2646693125139304345, 842468587426513207).Pow(2);
         public static readonly MyRational FivePiSquared = new MyRational(5).Multiply(PI.Pow(2));
 
-        public static readonly MyRational PiHalf = PI.Divide(new MyRational(2));
-        
-        
-        
-        
+        public static readonly MyRational PiHalf = PI.Divide(2);
+        public static readonly MyRational PiFourth = PI.Divide(4);
+
+
+
+
         // https://www.tandfonline.com/doi/full/10.1080/0020739X.2017.1352043
         // which evaluates to a decimal giving correctly the first 20 digits of e:
         public static readonly MyRational e = new MyRational(System.Numerics.BigInteger.Parse("611070150698522592097"), System.Numerics.BigInteger.Parse("224800145555521536000"));
@@ -451,10 +468,11 @@ namespace OsmPolygon.RationalMath
         }
 
 
-        public static MyRational Sqrt(MyRational n, MyRational epsilon)
+        // https://www.geeksforgeeks.org/find-root-of-a-number-using-newtons-method/
+        public static MyRational Sqrt(MyRational radicand, MyRational epsilon)
         {
-            // Assuming the sqrt of n as n only 
-            MyRational x = n;
+            // Assuming the sqrt of radicand as radicand only 
+            MyRational x = radicand;
 
             // The closed guess will be stored in the root 
             MyRational root;
@@ -467,7 +485,7 @@ namespace OsmPolygon.RationalMath
                 count++;
 
                 // Calculate more closed x 
-                root = MyRational.OneHalf * (x + (n / x));
+                root = MyRational.OneHalf * (x + (radicand / x));
 
                 // Check for closeness 
                 if ((root - x).Abs() < epsilon)
@@ -481,39 +499,38 @@ namespace OsmPolygon.RationalMath
         } // End Function SquareRoot 
 
 
-        // root(A, n)
+        // nth-root(radicand, degree) = root 
         // https://en.wikipedia.org/wiki/Nth_root#Using_Newton.27s_method
-        // https://www.geeksforgeeks.org/find-root-of-a-number-using-newtons-method/
-        public static MyRational Root(MyRational n, int exponent, MyRational epsilon)
+        public static MyRational Root(MyRational radicand, int degree, MyRational epsilon)
         {
-            if (exponent == 2)
-                return Sqrt(n, epsilon); // Should be lightly faster
-            
+            if (degree == 2)
+                return Sqrt(radicand, epsilon); // Should be lightly faster
+
             // Assuming the sqrt of n as n only 
-            MyRational x = n;
-            
+            MyRational x = radicand;
+
             // The closed guess will be stored in the root 
             MyRational root;
-            
-            int exp_minus_one = exponent - 1;
-            
-            MyRational one_over_exponent = new MyRational(1, exponent);
-            MyRational exponent_minus_one = new MyRational(exp_minus_one);
+
+            int degreeMinusOne = degree - 1;
+
+            MyRational one_over_degree = new MyRational(1, degree);
+            MyRational degree_minus_one = new MyRational(degreeMinusOne);
 
             // To count the number of iterations 
             int count = 0;
             while (true)
             {
                 count++;
-                
+
                 // Calculate more closed x 
-                root = one_over_exponent * (exponent_minus_one * x + (n / x.Pow(exp_minus_one)));
+                root = one_over_degree * (degree_minus_one * x + (radicand / x.Pow(degreeMinusOne)));
                 // x_{k+1}={\frac {1}{n}}\left({(n-1)x_{k}+{\frac {A}{x_{k}^{n-1}}}}\right)
-                
+
                 // Check for closeness 
                 if ((root - x).Abs() < epsilon)
                     break;
-                
+
                 // Update root 
                 x = root;
             } // Whend 
@@ -522,29 +539,45 @@ namespace OsmPolygon.RationalMath
         } // End Function RootN 
 
 
-        // r^n = x ==> r = root(x, n) = root(this, exponent)
-        public MyRational Root(int exponent)
-        {
-            System.Numerics.BigInteger.Pow(this.Numerator, -exponent);
-            System.Numerics.BigInteger.Pow(this.Denominator, -exponent);
-
-            MyRational xk = null;
-
-            MyRational oneOverN = new MyRational(1, exponent);
-
-
-
-
-            return new MyRational(0, 0);
-        }
-
-
-
         // this + other 
         public MyRational Add(MyRational other)
         {
             return new MyRational(this.Numerator * other.Denominator + this.Denominator * other.Numerator, this.Denominator * other.Denominator);
         }
+
+
+        // https://www.mathsisfun.com/numbers/addition.html
+        // augend + addend = sum
+        public MyRational Add(int addend)
+        {
+            MyRational other = new MyRational(addend);
+
+            return new MyRational(this.Numerator * other.Denominator + this.Denominator * other.Numerator, this.Denominator * other.Denominator);
+        }
+
+        public MyRational Add(uint addend)
+        {
+            MyRational other = new MyRational(addend);
+
+            return new MyRational(this.Numerator * other.Denominator + this.Denominator * other.Numerator, this.Denominator * other.Denominator);
+        }
+
+
+        public MyRational Add(long addend)
+        {
+            MyRational other = new MyRational(addend);
+
+            return new MyRational(this.Numerator * other.Denominator + this.Denominator * other.Numerator, this.Denominator * other.Denominator);
+        }
+
+
+        public MyRational Add(ulong addend)
+        {
+            MyRational other = new MyRational(addend);
+
+            return new MyRational(this.Numerator * other.Denominator + this.Denominator * other.Numerator, this.Denominator * other.Denominator);
+        }
+
 
         // this - other
         public MyRational Subtract(MyRational other)
@@ -552,17 +585,113 @@ namespace OsmPolygon.RationalMath
             return new MyRational(this.Numerator * other.Denominator - this.Denominator * other.Numerator, this.Denominator * other.Denominator);
         }
 
+
+        // https://www.mathsisfun.com/numbers/subtraction.html
+        // minuend - subtrahend = difference
+        public MyRational Subtract(int subtrahend)
+        {
+            MyRational other = new MyRational(subtrahend);
+
+            return new MyRational(this.Numerator * other.Denominator - this.Denominator * other.Numerator, this.Denominator * other.Denominator);
+        }
+
+        public MyRational Subtract(uint subtrahend)
+        {
+            MyRational other = new MyRational(subtrahend);
+
+            return new MyRational(this.Numerator * other.Denominator - this.Denominator * other.Numerator, this.Denominator * other.Denominator);
+        }
+
+        public MyRational Subtract(long subtrahend)
+        {
+            MyRational other = new MyRational(subtrahend);
+
+            return new MyRational(this.Numerator * other.Denominator - this.Denominator * other.Numerator, this.Denominator * other.Denominator);
+        }
+
+        public MyRational Subtract(ulong subtrahend)
+        {
+            MyRational other = new MyRational(subtrahend);
+
+            return new MyRational(this.Numerator * other.Denominator - this.Denominator * other.Numerator, this.Denominator * other.Denominator);
+        }
+
+
         // this * other
         public MyRational Multiply(MyRational other)
         {
             return new MyRational(this.Numerator * other.Numerator, this.Denominator * other.Denominator);
         }
 
+        // https://en.wikipedia.org/wiki/Logarithm
+        // multiplier * multiplicant = product 
+        public MyRational Multiply(int factor)
+        {
+            MyRational other = new MyRational(factor);
+
+            return new MyRational(this.Numerator * other.Numerator, this.Denominator * other.Denominator);
+        }
+
+
+        public MyRational Multiply(uint factor)
+        {
+            MyRational other = new MyRational(factor);
+
+            return new MyRational(this.Numerator * other.Numerator, this.Denominator * other.Denominator);
+        }
+
+        public MyRational Multiply(long factor)
+        {
+            MyRational other = new MyRational(factor);
+
+            return new MyRational(this.Numerator * other.Numerator, this.Denominator * other.Denominator);
+        }
+
+        public MyRational Multiply(ulong factor)
+        {
+            MyRational other = new MyRational(factor);
+
+            return new MyRational(this.Numerator * other.Numerator, this.Denominator * other.Denominator);
+        }
+
+
         // this/other
         public MyRational Divide(MyRational other)
         {
             return new MyRational(this.Numerator * other.Denominator, this.Denominator * other.Numerator);
         }
+
+        // 55 ÷ 9 = 6 and 1
+        // Dividend ÷ Divisor = Quotient and Remainder
+        public MyRational Divide(int divisor)
+        {
+            MyRational other = new MyRational(divisor);
+
+            return new MyRational(this.Numerator * other.Denominator, this.Denominator * other.Numerator);
+        }
+
+        public MyRational Divide(uint divisor)
+        {
+            MyRational other = new MyRational(divisor);
+
+            return new MyRational(this.Numerator * other.Denominator, this.Denominator * other.Numerator);
+        }
+
+        public MyRational Divide(long divisor)
+        {
+            MyRational other = new MyRational(divisor);
+
+            return new MyRational(this.Numerator * other.Denominator, this.Denominator * other.Numerator);
+        }
+
+        public MyRational Divide(ulong divisor)
+        {
+            MyRational other = new MyRational(divisor);
+
+            return new MyRational(this.Numerator * other.Denominator, this.Denominator * other.Numerator);
+        }
+
+
 
 
         // this \ other = (5/3)\(2/7) = 5 rem 5/21 ==> 5
@@ -728,7 +857,7 @@ namespace OsmPolygon.RationalMath
 
                 return (Sign < 0 ? "-" : "") + result + "." + new string(ca).TrimEnd(new char[] { '0' });
             }
-                
+
         }
 
 
@@ -740,7 +869,7 @@ namespace OsmPolygon.RationalMath
 
         public string ToRationalString()
         {
-            return this.Numerator.ToString(System.Globalization.CultureInfo.InvariantCulture) 
+            return this.Numerator.ToString(System.Globalization.CultureInfo.InvariantCulture)
                    + " / " +
                    this.Denominator.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
@@ -749,7 +878,7 @@ namespace OsmPolygon.RationalMath
         {
             get { return this.Div(One); }
         }
-        
+
         public MyRational FractionalPart
         {
             get { return this.Mod(One); }
@@ -763,7 +892,7 @@ namespace OsmPolygon.RationalMath
             return string.Concat(s, " ", f);
         }
 
-        
+
         // http://datagenetics.com/blog/july12019/index.html
         // https://en.wikipedia.org/wiki/Bhaskara_I%27s_sine_approximation_formula#:~:text=In%20mathematics%2C%20Bhaskara%20I's%20sine,in%20his%20treatise%20titled%20Mahabhaskariya.
         //  maximum absolute error in using the formula is around 0.0016. 
@@ -771,15 +900,15 @@ namespace OsmPolygon.RationalMath
         {
             MyRational sixteen = new MyRational(16);
             MyRational four = new MyRational(4);
-            
+
             MyRational nom = sixteen * this * (PI - this);
             MyRational denom = FivePiSquared - four * this * (PI - this);
 
             MyRational sine = nom.Divide(denom);
             return sine;
         }
-        
-        
+
+
         public MyRational Cos()
         {
             MyRational sixteen = new MyRational(16);
@@ -787,51 +916,124 @@ namespace OsmPolygon.RationalMath
 
             MyRational nom = PiSquared - four * this.Pow(2);
             MyRational denom = PiSquared + this.Pow(2);
-            
+
             MyRational cosine = nom.Divide(denom);
             return cosine;
         }
-        
-        
+
+
         public MyRational Tan()
         {
             return Sin() / Cos();
         }
 
-        
-        // https://www.britannica.com/science/cosecant
+
         public MyRational Sec()
         {
+            // https://www.britannica.com/science/cosecant
             return Cos().Inverse();
         }
-        
-        
-        // https://www.britannica.com/science/cosecant
+
+
         public MyRational Csc()
         {
+            // https://www.britannica.com/science/cosecant
             return Sin().Inverse();
         }
-        
-        
-        // https://www.britannica.com/science/cosecant
+
+
         public MyRational Cot()
         {
+            // https://www.britannica.com/science/cosecant
             return Cos() / Sin();
         }
-        
+
+
+        // reported maximum error 0.0015 radians (0.085944 degrees), lowest error in the paper.
+        // https://dsp.stackexchange.com/questions/20444/books-resources-for-implementing-various-mathematical-functions-in-fixed-point-a/20482#20482
+        public MyRational FastButBadArctan()
+        {
+            // http://nghiaho.com/?p=997
+            // return  π/4 * x - x * (fabs(x) - 1) * (0.2447 + 0.0663 * fabs(x));
+            return PiFourth * this - this * (this.Abs() - One) * (new MyRational(2447, 10000) + new MyRational(663, 10000) * this.Abs());
+        }
+
+
         public MyRational Arctan()
         {
-            throw new System.NotImplementedException("arctan");
-            return null;
+            // https://en.wikipedia.org/wiki/Inverse_trigonometric_functions#Infinite_series
+            MyRational sum = new MyRational(0);
+            MyRational epsilon = new MyRational(1, 1000000000000);
+
+            for (int n = 0; true; ++n)
+            {
+                MyRational dividend = MyRational.MinusOne.Pow(n) * this.Pow(2 * n + 1);
+                MyRational divisor = new MyRational(2 * n + 1);
+
+                MyRational quotient = dividend.Divide(divisor);
+
+                MyRational newSum = sum + quotient;
+
+                if (newSum.Subtract(sum).Abs() < epsilon)
+                {
+                    return newSum;
+                }
+
+                sum = newSum;
+            } // Next i 
+
         }
-        
-        
+
+
+        public MyRational Arcsin()
+        {
+            // https://en.wikipedia.org/wiki/Inverse_trigonometric_functions#Extension_to_complex_plane
+            // https://dsp.stackexchange.com/questions/25770/looking-for-an-arcsin-algorithm
+            MyRational divisor = Sqrt(One.Subtract(this.Pow(2)), new MyRational(1, 10000));
+            MyRational x = this.Divide(divisor);
+
+            return x.Arctan();
+        }
+
+        public MyRational Arcsec()
+        {
+            // https://brownmath.com/twt/inverse.htm
+            // Arcsec x = Arccos(1/x)
+            return One.Divide(this).Arccos();
+        }
+
+
+        public MyRational Arccos()
+        {
+            // https://en.wikipedia.org/wiki/Inverse_trigonometric_functions#Relationships_among_the_inverse_trigonometric_functions
+            return PiHalf - this.Arcsin();
+        }
+
+
+        public MyRational Arccot()
+        {
+            // https://en.wikipedia.org/wiki/Inverse_trigonometric_functions#Relationships_among_the_inverse_trigonometric_functions
+            return PiHalf - this.Arctan();
+        }
+
+
+        public MyRational Arccsc()
+        {
+            // https://en.wikipedia.org/wiki/Inverse_trigonometric_functions#Relationships_among_the_inverse_trigonometric_functions
+            // return PiHalf - this.Arcsec();
+
+            // https://brownmath.com/twt/inverse.htm
+            // Arccsc x = Arcsin(1/x)
+            return One.Divide(this).Arcsin();
+        }
+
+
         // https://en.wikipedia.org/wiki/Inverse_trigonometric_functions
         public MyRational Arctan2(MyRational y, MyRational x)
         {
             if (x.Numerator == System.Numerics.BigInteger.Zero)
             {
-                if(y.Numerator == System.Numerics.BigInteger.Zero)
+                if (y.Numerator == System.Numerics.BigInteger.Zero)
                     throw new System.ArithmeticException("arctan2(0,0) is undefined.");
 
                 if (y.Sign == 1)
@@ -839,20 +1041,20 @@ namespace OsmPolygon.RationalMath
                 else
                     return -PiHalf;
             }
-            
+
             if (x.Sign == 1)
                 return (y / x).Arctan();
 
             if (y.Sign == -1)
                 return (y / x).Arctan().Subtract(PI);
-            
+
             return (y / x).Arctan().Add(PI);
         }
-        
-        
+
+
         // Lacks Log10, Log, Round, Ceiling, Floor, Truncate, SetScale, ToMixString
         // ShiftDecimalLeft ShiftDecimalRight
     }
-    
-    
+
+
 }

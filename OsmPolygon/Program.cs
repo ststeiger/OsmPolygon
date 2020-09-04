@@ -1,4 +1,6 @@
 ﻿
+using OsmPolygon.RationalMath;
+
 namespace OsmPolygon
 {
 
@@ -44,8 +46,152 @@ namespace OsmPolygon
 
 
 
+
+        // http://www.luschny.de/math/factorial/FastFactorialFunctions.htm
+        // http://www.luschny.de/math/factorial/csharp/FactorialSplit.cs.html
+        public static class FactorialSplit
+        {
+            
+
+            public static System.Numerics.BigInteger Factorial(int n)
+            {
+                if (n < 0)
+                {
+                    throw new System.ArgumentOutOfRangeException("n", nameof(FactorialSplit) + "." + nameof(Factorial) + ": n >= 0 required, but was " + n);
+                }
+
+                if (n < 2) 
+                    return System.Numerics.BigInteger.One;
+
+                ulong[] knownFactorials = new ulong[] { 1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800, 479001600, 6227020800, 87178291200, 1307674368000, 20922789888000, 355687428096000, 6402373705728000, 121645100408832000 };
+
+                if (n < knownFactorials.Length)
+                    return knownFactorials[n];
+
+                System.Numerics.BigInteger p = System.Numerics.BigInteger.One;
+                System.Numerics.BigInteger r = System.Numerics.BigInteger.One;
+                System.Numerics.BigInteger currentN = System.Numerics.BigInteger.One;
+
+                int h = 0, shift = 0, high = 1;
+                int log2n = (int) System.Math.Floor(System.Numerics.BigInteger.Log(n) / System.Numerics.BigInteger.Log(2));
+                while (h != n)
+                {
+                    shift += h;
+                    h = n >> log2n--;
+                    int len = high;
+                    high = (h - 1) | 1;
+                    len = (high - len) / 2;
+
+                    if (len > 0)
+                    {
+                        p *= Product(len, ref currentN);
+                        r *= p;
+                    }
+                }
+
+                return r << shift;
+            }
+
+
+            private static System.Numerics.BigInteger Product(int n, ref System.Numerics.BigInteger currentN)
+            {
+                int m = n / 2;
+                if (m == 0) return currentN += 2;
+                if (n == 2) return (currentN += 2) * (currentN += 2);
+                return Product(n - m, ref currentN) * Product(m, ref currentN);
+            }
+
+
+        }
+
+
+        class Continued
+        {
+            static double Calc(System.Func<int, int[]> f, int n)
+            {
+                double temp = 0.0;
+                for (int ni = n; ni >= 1; ni--)
+                {
+                    int[] p = f(ni);
+                    temp = p[1] / (p[0] + temp);
+                }
+                return f(0)[0] + temp;
+            }
+
+
+            public struct XYZ
+            {
+                public int Ai;
+                public double Bi;
+            }
+
+            public static XYZ foo(int n, double z)
+            {
+                int a0 = 0;
+
+                // https://functions.wolfram.com/ElementaryFunctions/ArcTan/10/
+                return new XYZ()
+                {
+                    Ai = n > 0 ? (2 * n - 1) : a0,
+                    Bi = (n == 0 ? z : n*n* z*z )
+                };
+            }
+
+
+            // https://functions.wolfram.com/ElementaryFunctions/ArcTan/10/
+            // https://rosettacode.org/wiki/Continued_fraction#C.2B.2B
+            // https://rosettacode.org/wiki/Continued_fraction#C.23
+            // https://en.wikipedia.org/wiki/Continued_fraction
+            // https://en.wikipedia.org/wiki/Inverse_trigonometric_functions#Continued_fractions_for_arctangent
+            static double ArcTan(double z, int n)
+            {
+                double temp = 0.0;
+                for (int ni = n; ni >= 1; ni--)
+                {
+                    // 3 ==> 5, 2.25
+                    XYZ p = foo(ni, z);
+                    temp = p.Bi / (p.Ai + temp);
+                }
+
+
+                double omg = foo(0, z).Ai;
+                
+
+                return  omg + temp;
+            }
+
+
+            public static void Test()
+            {
+                double at = ArcTan(0.5, 300); // 0,463647609
+                System.Console.WriteLine(at);
+
+
+                System.Collections.Generic.List<System.Func<int, int[]>> fList = new System.Collections.Generic.List<System.Func<int, int[]>>();
+
+                // f(n) => int[]{ai, bi};
+                fList.Add(n => new int[] { n > 0 ? 2 : 1, 1 });
+                fList.Add(n => new int[] { n > 0 ? n : 2, n > 1 ? (n - 1) : 1 });
+                fList.Add(n => new int[] { n > 0 ? 6 : 3, (int)System.Math.Pow(2 * n - 1, 2) });
+
+
+                fList.Add(n => new int[] { n > 0 ? 6 : 3, (int)System.Math.Pow(2 * n - 1, 2) });
+
+
+                foreach (var f in fList)
+                {
+                    System.Console.WriteLine(Calc(f, 200));
+                }
+            }
+        }
+
+
+
+
         static void Main(string[] args)
         {
+            Continued.Test();
+
             RationalMath.MyRational.Test();
             FixedMath.FixedDecimalTests.TestMe(123.456M);
 
