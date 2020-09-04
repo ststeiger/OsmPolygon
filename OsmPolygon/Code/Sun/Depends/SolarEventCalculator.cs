@@ -15,6 +15,7 @@
  */
 
 
+using OsmPolygon.RationalMath;
 using OsmPolygon.sunrisesunset.dto;
 using System;
 

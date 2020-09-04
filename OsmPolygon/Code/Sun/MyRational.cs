@@ -1,12 +1,92 @@
 ﻿
+using Microsoft.Extensions.FileSystemGlobbing.Internal;
+using System;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading;
 
 namespace OsmPolygon.RationalMath
 {
 
 
+
+    // https://docs.oracle.com/javase/7/docs/api/java/math/RoundingMode.html
+    public enum RoundingMode
+    {
+        CEILING // Rounding mode to round towards positive infinity.
+        , DOWN // Rounding mode to round towards zero.
+        , FLOOR // Rounding mode to round towards negative infinity.
+        , HALF_DOWN // Rounding mode to round towards "nearest neighbor" unless both neighbors are equidistant, in which case round down.
+        , HALF_EVEN // Rounding mode to round towards the "nearest neighbor" unless both neighbors are equidistant, in which case, round towards the even neighbor.
+        , HALF_UP // Rounding mode to round towards "nearest neighbor" unless both neighbors are equidistant, in which case round up.
+        , UNNECESSARY //Rounding mode to assert that the requested operation has an exact result, hence no rounding is necessary.
+        , UP // Rounding mode to round away from zero.
+    }
+
+    // https://github.com/openjdk/jdk/blob/master/src/java.base/share/classes/java/math/MathContext.java
+    public class MathContext
+    {
+        //  π = 22⁄7 = ​355⁄113.
+        //  The latter fraction is the best possible rational approximation of π 
+        // using fewer than five decimal digits in the numerator and denominator
+        // , being accurate to 6 decimal places
+        // 86953/27678, accurate to 8 decimal places
+        // https://en.wikipedia.org/wiki/Mil%C3%BC#:~:text=355113%20is%20the%20best,than%2013748629.
+        // http://qin.laya.com/tech_projects_approxpi.html
+        // Num.                Den.                = Result                                   (Accuracy                                 )
+        // 2646693125139304345/ 842468587426513207 = 3.14159265358979323846264338327950288418 ( 0.00000000000000000000000000000000000001) [37]
+
+        // https://en.wikipedia.org/wiki/Approximations_of_%CF%80
+
+        public MyRational Epsilon;
+        public RoundingMode Rounding;
+
+        // The default-values for the constructor - DRY ! 
+        private const int DEFAULT_SCALE = 10;
+        private const RoundingMode DEFAULT_ROUNDING = RoundingMode.HALF_UP;
+
+        private static int IntPow(int basis, uint exponent)
+        {
+            if (exponent < 0)
+                throw new System.ArgumentException("Exponent cannot be < 0 !");
+
+            int ret = 1;
+            while (exponent != 0)
+            {
+                if ((exponent & 1) == 1)
+                    ret *= basis;
+
+                basis *= basis;
+                exponent >>= 1;
+            }
+            return ret;
+        }
+
+        public MathContext(int scale, RoundingMode mode)
+        {
+            // this.Epsilon = new MyRational(System.Numerics.BigInteger.One, System.Numerics.BigInteger.Pow(10, scale));
+            this.Epsilon = new MyRational(System.Numerics.BigInteger.One, 10000);
+            this.Rounding = mode;
+        }
+
+        public MathContext(int scale)
+            : this(scale, DEFAULT_ROUNDING)
+        { }
+
+        public MathContext(RoundingMode mode)
+            : this(DEFAULT_SCALE, mode)
+        { }
+
+
+        public MathContext()
+            : this(DEFAULT_SCALE, DEFAULT_ROUNDING)
+        { }
+
+    } // End Class MathContext 
+
+
+
+    // «BigRational»
     public class MyRational
+        : System.IComparable, System.IComparable<MyRational>, System.IEquatable<MyRational>
     {
 
         public readonly System.Numerics.BigInteger Numerator;
@@ -323,54 +403,70 @@ namespace OsmPolygon.RationalMath
         }
 
 
-        /*
+
+        #region System.IComparable
+
+        int System.IComparable.CompareTo(object obj)
+        {
+            if (!(obj is MyRational))
+                throw new System.ArgumentException("System.IComparable.CompareTo: obj is not a MyRational");
+
+            return MyCompare(this, (MyRational)obj);
+        }
+
+
+        public int CompareTo(object other)
+        {
+            return ((System.IComparable)this).CompareTo(other);
+        }
+
+        #endregion // System.IComparable
+
+
+
+        #region System.IComparable<MyRational>
+        int IComparable<MyRational>.CompareTo(MyRational other)
+        {
+            return MyCompare(this, other);
+        }
+
+
+
         // Return a number that is positive, zero or negative, respectively, if
         // the value of this Rational is bigger than f ==> +1,
         // the values of this Rational and f are equal or ==> 0
         // the value of this Rational is smaller than f ==> -1
         public int CompareTo(MyRational other)
         {
-
-
-            if (other == null)
-                throw new System.ArgumentNullException("other");
-
-            // Why ? Correct ? 
-
-            //// Make copies
-            //System.Numerics.BigInteger one = this.Numerator;
-            //System.Numerics.BigInteger two = other.Numerator;
-
-            //// cross multiply
-            //one *= other.Denominator;
-            //two *= this.Denominator;
-
-            ////test
-            //return System.Numerics.BigInteger.Compare(one, two);
-
-            MyRational delta = this.Subtract(other);
-            return delta.Sign;
+            return MyCompare(this, other);
         }
 
 
 
+        #endregion // System.IComparable<MyRational>
 
-        public System.Numerics.BigInteger CompareTo(object other)
-        {
-            if (!(other is MyRational))
-                throw new System.ArgumentException("other is not a MyRational");
 
-            return CompareTo((MyRational)other);
-        }
-        */
 
-        public bool Equals(MyRational other)
+        #region System.IEquatable<MyRational>
+
+        bool IEquatable<MyRational>.Equals(MyRational other)
         {
             if (other == null)
                 throw new System.ArgumentNullException("other");
 
             return this.Numerator == other.Numerator && this.Denominator == other.Denominator;
         }
+
+        public bool Equals(MyRational other)
+        {
+            return ((IEquatable<MyRational>)this).Equals(other);
+        }
+
+        #endregion // System.IEquatable<MyRational>
+
+
+
+
 
         public override bool Equals(object other)
         {
@@ -467,6 +563,29 @@ namespace OsmPolygon.RationalMath
             );
         }
 
+        public MyRational Pow(System.Numerics.BigInteger exponent)
+        {
+            if (exponent < 0)
+            {
+                exponent = -exponent;
+
+                MyRational dividend = new MyRational(1, MyRational.Pow(this.Numerator, exponent));
+                MyRational divisor = new MyRational(1, MyRational.Pow(this.Denominator, exponent));
+                MyRational quotient = dividend.Divide(divisor);
+                return quotient;
+            }
+
+            return new MyRational(
+                  MyRational.Pow(this.Numerator, exponent)
+                , MyRational.Pow(this.Denominator, exponent)
+            );
+        }
+
+
+        // private static System.Numerics.BigInteger Pow(System.Numerics.BigInteger value, System.Numerics.BigInteger exponent)
+
+
+
 
         // https://www.geeksforgeeks.org/find-root-of-a-number-using-newtons-method/
         public static MyRational Sqrt(MyRational radicand, MyRational epsilon)
@@ -501,7 +620,7 @@ namespace OsmPolygon.RationalMath
 
         // nth-root(radicand, degree) = root 
         // https://en.wikipedia.org/wiki/Nth_root#Using_Newton.27s_method
-        public static MyRational Root(MyRational radicand, int degree, MyRational epsilon)
+        public static MyRational Root(MyRational radicand, System.Numerics.BigInteger degree, MyRational epsilon)
         {
             if (degree == 2)
                 return Sqrt(radicand, epsilon); // Should be lightly faster
@@ -512,7 +631,7 @@ namespace OsmPolygon.RationalMath
             // The closed guess will be stored in the root 
             MyRational root;
 
-            int degreeMinusOne = degree - 1;
+            System.Numerics.BigInteger degreeMinusOne = degree - 1;
 
             MyRational one_over_degree = new MyRational(1, degree);
             MyRational degree_minus_one = new MyRational(degreeMinusOne);
@@ -849,15 +968,12 @@ namespace OsmPolygon.RationalMath
                 // return result + "." + new string(sb.ToString().Reverse().ToArray());
                 return (Sign < 0 ? "-" : "") + result + "." + new string(ca);
             }
+            // else
 
-            else
-            {
-                char[] ca = sb.ToString().ToCharArray();
-                System.Array.Reverse(ca);
+            char[] caa = sb.ToString().ToCharArray();
+            System.Array.Reverse(caa);
 
-                return (Sign < 0 ? "-" : "") + result + "." + new string(ca).TrimEnd(new char[] { '0' });
-            }
-
+            return (Sign < 0 ? "-" : "") + result + "." + new string(caa).TrimEnd(new char[] { '0' });
         }
 
 
@@ -959,11 +1075,11 @@ namespace OsmPolygon.RationalMath
         }
 
 
-        public MyRational Arctan()
+
+        public MyRational Arctan(MathContext mc)
         {
             // https://en.wikipedia.org/wiki/Inverse_trigonometric_functions#Infinite_series
             MyRational sum = new MyRational(0);
-            MyRational epsilon = new MyRational(1, 1000000000000);
 
             for (int n = 0; true; ++n)
             {
@@ -974,7 +1090,7 @@ namespace OsmPolygon.RationalMath
 
                 MyRational newSum = sum + quotient;
 
-                if (newSum.Subtract(sum).Abs() < epsilon)
+                if (newSum.Subtract(sum).Abs() < mc.Epsilon)
                 {
                     return newSum;
                 }
@@ -985,51 +1101,87 @@ namespace OsmPolygon.RationalMath
         }
 
 
-        public MyRational Arcsin()
+        public MyRational Arctan()
+        {
+            return Arctan(new MathContext());
+        }
+
+
+        public MyRational Arcsin(MathContext mc)
         {
             // https://en.wikipedia.org/wiki/Inverse_trigonometric_functions#Extension_to_complex_plane
             // https://dsp.stackexchange.com/questions/25770/looking-for-an-arcsin-algorithm
             MyRational divisor = Sqrt(One.Subtract(this.Pow(2)), new MyRational(1, 10000));
             MyRational x = this.Divide(divisor);
 
-            return x.Arctan();
+            return x.Arctan(mc);
+        }
+
+
+        public MyRational Arcsin()
+        {
+            return Arcsin(new MathContext());
+        }
+
+
+        public MyRational Arcsec(MathContext mc)
+        {
+            // https://brownmath.com/twt/inverse.htm
+            // Arcsec x = Arccos(1/x)
+            return One.Divide(this).Arccos(mc);
         }
 
         public MyRational Arcsec()
         {
-            // https://brownmath.com/twt/inverse.htm
-            // Arcsec x = Arccos(1/x)
-            return One.Divide(this).Arccos();
+            return Arcsec(new MathContext());
+        }
+
+
+        public MyRational Arccos(MathContext mc)
+        {
+            // https://en.wikipedia.org/wiki/Inverse_trigonometric_functions#Relationships_among_the_inverse_trigonometric_functions
+            return PiHalf - this.Arcsin(mc);
         }
 
 
         public MyRational Arccos()
         {
+            return Arccos(new MathContext());
+        }
+
+
+        public MyRational Arccot(MathContext mc)
+        {
             // https://en.wikipedia.org/wiki/Inverse_trigonometric_functions#Relationships_among_the_inverse_trigonometric_functions
-            return PiHalf - this.Arcsin();
+            return PiHalf - this.Arctan(mc);
         }
 
 
         public MyRational Arccot()
         {
-            // https://en.wikipedia.org/wiki/Inverse_trigonometric_functions#Relationships_among_the_inverse_trigonometric_functions
-            return PiHalf - this.Arctan();
+            return Arccot(new MathContext());
         }
 
 
-        public MyRational Arccsc()
+        public MyRational Arccsc(MathContext mc)
         {
             // https://en.wikipedia.org/wiki/Inverse_trigonometric_functions#Relationships_among_the_inverse_trigonometric_functions
             // return PiHalf - this.Arcsec();
 
             // https://brownmath.com/twt/inverse.htm
             // Arccsc x = Arcsin(1/x)
-            return One.Divide(this).Arcsin();
+            return One.Divide(this).Arcsin(mc);
+        }
+
+
+        public MyRational Arccsc()
+        {
+            return Arccsc(new MathContext());
         }
 
 
         // https://en.wikipedia.org/wiki/Inverse_trigonometric_functions
-        public MyRational Arctan2(MyRational y, MyRational x)
+        public MyRational Arctan2(MyRational y, MyRational x, MathContext mc)
         {
             if (x.Numerator == System.Numerics.BigInteger.Zero)
             {
@@ -1043,12 +1195,178 @@ namespace OsmPolygon.RationalMath
             }
 
             if (x.Sign == 1)
-                return (y / x).Arctan();
+                return (y / x).Arctan(mc);
 
             if (y.Sign == -1)
-                return (y / x).Arctan().Subtract(PI);
+                return (y / x).Arctan(mc).Subtract(PI);
 
-            return (y / x).Arctan().Add(PI);
+            return (y / x).Arctan(mc).Add(PI);
+        }
+
+        public MyRational Arctan2(MyRational y, MyRational x)
+        {
+            return Arctan2(y, x, new MathContext());
+        }
+
+
+        public System.Numerics.BigInteger SlowPow(System.Numerics.BigInteger value, System.Numerics.BigInteger exponent)
+        {
+            if (exponent < 0)
+                throw new System.ArgumentException("Exponent cannot be < 0 !");
+
+            if (exponent == 0)
+            {
+                if (value != 0)
+                    return 1;
+                else
+                    throw new System.ArithmeticException("0^0 is not defined");
+            }
+
+            System.Numerics.BigInteger originalValue = value;
+            while (exponent-- > 1)
+                value = System.Numerics.BigInteger.Multiply(value, originalValue);
+
+            return value;
+        }
+
+
+        private static System.Numerics.BigInteger Pow(System.Numerics.BigInteger value, System.Numerics.BigInteger exponent)
+        {
+            if (exponent < 0)
+                throw new System.ArgumentException("Exponent cannot be < 0 !");
+
+            if (exponent == 0)
+            {
+                if (value != 0)
+                    return 1;
+                else
+                    throw new System.ArithmeticException("0^0 is not defined");
+            }
+
+            System.Numerics.BigInteger total = 1;
+            while (exponent > int.MaxValue)
+            {
+                exponent -= int.MaxValue;
+                total = total * System.Numerics.BigInteger.Pow(value, int.MaxValue);
+            }
+
+            total = total * System.Numerics.BigInteger.Pow(value, (int)exponent);
+            return total;
+        }
+
+
+        // x^(m/n) = root(x^m,n) = root(x,n)^m
+        //   ==> (x/y)^(m/n) =  (x^(m/n))/(y^(m/n))
+        //     ==> root(x^m,n) / root(y^m,n)
+        public MyRational Pow(MyRational exponent, MathContext mc)
+        {
+            System.Numerics.BigInteger numerPow = Pow(this.Numerator, exponent.Numerator);
+            MyRational num = MyRational.Root(new MyRational(numerPow), this.Denominator, mc.Epsilon);
+
+            System.Numerics.BigInteger denomPow = Pow(this.Denominator, exponent.Numerator);
+            MyRational denom = MyRational.Root(new MyRational(denomPow), this.Denominator, mc.Epsilon);
+
+            return num.Divide(denom);
+        }
+
+        public MyRational Pow(MyRational exponent)
+        {
+            return Pow(exponent, new MathContext());
+        }
+
+
+        // https://pwg.gsfc.nasa.gov/stargaze/Slog4.htm
+        // https://www.purplemath.com/modules/logrules.htm
+        // Basic Log Rules & Expanding Log Expressions
+        // 1) logb(mn) = logb(m) + logb(n)
+        // 2) logb(m/n) = logb(m) – logb(n)
+        // 3) logb(mn) = n · logb(m)
+
+        // logn(x) = ln(x)/ln(n)
+
+        public MyRational ln(MathContext mc)
+        {
+            // ln(x) can be expressed as (x^ h - 1)/ h
+            // logn(x) = ln(x) / ln(n).
+            MyRational log = (this.Pow(mc.Epsilon, mc) - One) / mc.Epsilon;
+
+            return log;
+        }
+
+        public MyRational ln()
+        {
+            return ln(new MathContext(10));
+        }
+
+
+
+
+
+
+
+        public static double ln(double x, double h)
+        {
+            return (Math.Pow(x, h) - 1) / h;
+        }
+
+
+        public static double ln(double x)
+        {
+            double h = 0.000000001d; // where h approaches 0
+            return ln(x, h);
+        }
+
+
+        // logn(x) = ln(x)/ln(n).
+        public static double log(double x, double n, double epsilon)
+        {
+            return ln(x, epsilon) / ln(n, epsilon);
+        }
+
+
+        public static double log(double x, double n)
+        {
+
+            double h = 0.000000001d; // where h approaches 0
+            return log(x, n, h);
+        }
+
+
+        // Using Newton's method, the iteration simplifies to (implementation) 
+        // which has cubic convergence to ln(x).
+        public static double lne(double x, double epsilon)
+        {
+            // https://en.wikipedia.org/wiki/Natural_logarithm#High_precision
+            double yn = x;
+            double yn1 = x;
+
+            do
+            {
+                yn = yn1;
+                yn1 = yn + 2 * (x - System.Math.Exp(yn)) / (x + System.Math.Exp(yn));
+            } while (System.Math.Abs(yn - yn1) > epsilon);
+
+            return yn1;
+        }
+
+
+
+        public static void LogTest()
+        {
+            double log2 = System.Math.Log(2);
+
+            double h = 1d;
+
+            for (int i = 0; i < 15; ++i)
+            {
+                h /= 10.0d;
+
+                // double loga = ln(2, h);
+                double loga = lne(2, h);
+                double delta = System.Math.Abs(log2 - loga);
+                System.Console.WriteLine("{0}: {1}", i, delta);
+            }
+
         }
 
 

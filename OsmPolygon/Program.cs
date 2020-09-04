@@ -119,18 +119,18 @@ namespace OsmPolygon
             }
 
 
-            public struct XYZ
+            public struct FractionParameters
             {
                 public int Ai;
                 public double Bi;
             }
 
-            public static XYZ foo(int n, double z)
+            public static FractionParameters foo(int n, double z)
             {
                 int a0 = 0;
 
                 // https://functions.wolfram.com/ElementaryFunctions/ArcTan/10/
-                return new XYZ()
+                return new FractionParameters()
                 {
                     Ai = n > 0 ? (2 * n - 1) : a0,
                     Bi = (n == 0 ? z : n*n* z*z )
@@ -149,19 +149,16 @@ namespace OsmPolygon
                 for (int ni = n; ni >= 1; ni--)
                 {
                     // 3 ==> 5, 2.25
-                    XYZ p = foo(ni, z);
+                    FractionParameters p = foo(ni, z);
                     temp = p.Bi / (p.Ai + temp);
-                }
-
+                } // Next ni 
 
                 double omg = foo(0, z).Ai;
-                
-
                 return  omg + temp;
-            }
+            } // End Function ArcTan 
 
-            
-            
+
+
 
             // https://functions.wolfram.com/ElementaryFunctions/ArcTan/10/
             // https://rosettacode.org/wiki/Continued_fraction#C.2B.2B
@@ -176,22 +173,23 @@ namespace OsmPolygon
                     // 3 ==> 5, 2.25
                     // 2 ==> 3, 1
                     // 1 ==> 1, 0.25
-                    int a0 = 666;
-                    int Ai = n > 0 ? (2 * n - 1) : a0;
+                    int Ai = (2 * n - 1);
                     double Bi = n*n * z*z;
                     
                     temp = Bi / (Ai + temp);
-                }
+                } // Next n 
                 
                 // 0, 0.5
                 return z / temp;
-            }
+            } // End Function NewArcTan 
 
-            
 
             public static void Test()
             {
-                double at = NewArcTan(0.5, 300); // 0,463647609
+                MyRational.LogTest();
+                
+
+                double at = NewArcTan(0.5, 3); // Excel: arctan(0.5) = 0.463647609 rad = 26.565051177098°
                 System.Console.WriteLine(at);
 
 

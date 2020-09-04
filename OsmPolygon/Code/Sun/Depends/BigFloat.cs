@@ -2,55 +2,16 @@
 // https://github.com/Osinko/BigFloat/blob/master/src/BigFloat.cs
 namespace OsmPolygon.sunrisesunset
 {
-    using System;
-    using System.Linq;
-    using System.Text;
+    using OsmPolygon.RationalMath;
     using System.Numerics;
-    using System.Runtime.CompilerServices;
-
-
-    // https://docs.oracle.com/javase/7/docs/api/java/math/RoundingMode.html
-    public enum RoundingMode
-    {
-         CEILING // Rounding mode to round towards positive infinity.
-        ,DOWN // Rounding mode to round towards zero.
-        ,FLOOR // Rounding mode to round towards negative infinity.
-        ,HALF_DOWN // Rounding mode to round towards "nearest neighbor" unless both neighbors are equidistant, in which case round down.
-        ,HALF_EVEN // Rounding mode to round towards the "nearest neighbor" unless both neighbors are equidistant, in which case, round towards the even neighbor.
-        ,HALF_UP // Rounding mode to round towards "nearest neighbor" unless both neighbors are equidistant, in which case round up.
-        ,UNNECESSARY //Rounding mode to assert that the requested operation has an exact result, hence no rounding is necessary.
-        ,UP // Rounding mode to round away from zero.
-    }
-
-    // https://github.com/openjdk/jdk/blob/master/src/java.base/share/classes/java/math/MathContext.java
-    public class MathContext
-    {
-        //  π = 22⁄7 = ​355⁄113.
-        //  The latter fraction is the best possible rational approximation of π 
-        // using fewer than five decimal digits in the numerator and denominator
-        // , being accurate to 6 decimal places
-        // 86953/27678, accurate to 8 decimal places
-        // https://en.wikipedia.org/wiki/Mil%C3%BC#:~:text=355113%20is%20the%20best,than%2013748629.
-        // http://qin.laya.com/tech_projects_approxpi.html
-        // Num.                Den.                = Result                                   (Accuracy                                 )
-        // 2646693125139304345/ 842468587426513207 = 3.14159265358979323846264338327950288418 ( 0.00000000000000000000000000000000000001) [37]
-
-        // https://en.wikipedia.org/wiki/Approximations_of_%CF%80
-
-        public MathContext()
-        { }
-
-        public MathContext(int x)
-        { }
-    }
 
 
     // https://github.com/openjdk-mirror/jdk7u-jdk/blob/master/src/share/classes/java/math/BigDecimal.java
     // https://github.com/Osinko/BigFloat/blob/master/src/BigFloat.cs
     // Implementation of BigDecimal 
-    [Serializable]
+    [System.Serializable]
     public class BigFloat 
-        : IComparable, IComparable<BigFloat>, IEquatable<BigFloat>
+        : System.IComparable, System.IComparable<BigFloat>, System.IEquatable<BigFloat>
     {
         private BigInteger numerator;
         private BigInteger denominator;
@@ -192,7 +153,7 @@ namespace OsmPolygon.sunrisesunset
 
             else if (roundingMode == RoundingMode.UNNECESSARY)
             {  // Rounding prohibited
-                throw new ArithmeticException("Rounding necessary");
+                throw new System.ArithmeticException("Rounding necessary");
             }
             else
             {
@@ -326,7 +287,7 @@ namespace OsmPolygon.sunrisesunset
         {
             this.numerator = numerator;
             if (denominator == 0)
-                throw new ArgumentException("denominator equals 0");
+                throw new System.ArgumentException("denominator equals 0");
             this.denominator = BigInteger.Abs(denominator);
         }
         public BigFloat(BigInteger value)
@@ -382,7 +343,7 @@ namespace OsmPolygon.sunrisesunset
         public BigFloat Add(BigFloat other)
         {
             if (BigFloat.Equals(other, null))
-                throw new ArgumentNullException("other");
+                throw new System.ArgumentNullException("other");
 
             this.numerator = this.numerator * other.denominator + other.numerator * this.denominator;
             this.denominator *= other.denominator;
@@ -391,7 +352,7 @@ namespace OsmPolygon.sunrisesunset
         public BigFloat Subtract(BigFloat other)
         {
             if (BigFloat.Equals(other, null))
-                throw new ArgumentNullException("other");
+                throw new System.ArgumentNullException("other");
 
             this.numerator = this.numerator * other.denominator - other.numerator * this.denominator;
             this.denominator *= other.denominator;
@@ -400,7 +361,7 @@ namespace OsmPolygon.sunrisesunset
         public BigFloat Multiply(BigFloat other)
         {
             if (BigFloat.Equals(other, null))
-                throw new ArgumentNullException("other");
+                throw new System.ArgumentNullException("other");
 
             this.numerator *= other.numerator;
             this.denominator *= other.denominator;
@@ -409,7 +370,7 @@ namespace OsmPolygon.sunrisesunset
         public BigFloat Divide(BigFloat other)
         {
             if (BigInteger.Equals(other, null))
-                throw new ArgumentNullException("other");
+                throw new System.ArgumentNullException("other");
             if (other.numerator == 0)
                 throw new System.DivideByZeroException("other");
 
@@ -420,7 +381,7 @@ namespace OsmPolygon.sunrisesunset
         public BigFloat Remainder(BigFloat other)
         {
             if (BigInteger.Equals(other, null))
-                throw new ArgumentNullException("other");
+                throw new System.ArgumentNullException("other");
 
             //b = a mod n
             //remainder = a - floor(a/n) * n
@@ -561,7 +522,7 @@ namespace OsmPolygon.sunrisesunset
         }
         public double Sqrt()
         {
-            return Math.Pow(10, BigInteger.Log10(numerator) / 2) / Math.Pow(10, BigInteger.Log10(denominator) / 2);
+            return System.Math.Pow(10, BigInteger.Log10(numerator) / 2) / System.Math.Pow(10, BigInteger.Log10(denominator) / 2);
         }
         public double Log10()
         {
@@ -596,7 +557,7 @@ namespace OsmPolygon.sunrisesunset
             else if (decimals == 0)
                 return result.ToString();
 
-            StringBuilder sb = new StringBuilder();
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
             while (precision-- > 0 && decimals > 0)
             {
@@ -604,12 +565,22 @@ namespace OsmPolygon.sunrisesunset
                 decimals /= 10;
             }
 
+
             if (trailingZeros)
+            {
+                char[] ca = sb.ToString().ToCharArray();
+                System.Array.Reverse(ca);
+
                 // return result + "." + new string(sb.ToString().Reverse().ToArray());
-                return (Sign < 0 ? "-" : "") + result + "." + new string(sb.ToString().Reverse().ToArray());
-            else
-                // return result + "." + new string(sb.ToString().Reverse().ToArray()).TrimEnd(new char[] { '0' });
-                return (Sign < 0 ? "-" : "") + result + "." + new string(sb.ToString().Reverse().ToArray()).TrimEnd(new char[] { '0' });
+                return (Sign < 0 ? "-" : "") + result + "." + new string(ca);
+            }
+            // else
+
+            char[] caa = sb.ToString().ToCharArray();
+            System.Array.Reverse(caa);
+
+            // return result + "." + new string(sb.ToString().Reverse().ToArray()).TrimEnd(new char[] { '0' });
+            return (Sign < 0 ? "-" : "") + result + "." + new string(caa).TrimEnd(new char[] { '0' });
         }
 
 
@@ -635,7 +606,7 @@ namespace OsmPolygon.sunrisesunset
         public int CompareTo(BigFloat other)
         {
             if (BigFloat.Equals(other, null))
-                throw new ArgumentNullException("other");
+                throw new System.ArgumentNullException("other");
 
             //Make copies
             BigInteger one = this.numerator;
@@ -651,7 +622,7 @@ namespace OsmPolygon.sunrisesunset
         public int CompareTo(object other)
         {
             if (other == null)
-                throw new ArgumentNullException("other");
+                throw new System.ArgumentNullException("other");
 
             if (!(other is BigFloat))
                 throw new System.ArgumentException("other is not a BigFloat");
@@ -782,7 +753,7 @@ namespace OsmPolygon.sunrisesunset
         public static BigFloat Parse(string value)
         {
             if (value == null)
-                throw new ArgumentNullException("value");
+                throw new System.ArgumentNullException("value");
 
             value.Trim();
             value = value.Replace(",", "");
@@ -819,12 +790,12 @@ namespace OsmPolygon.sunrisesunset
                 result = BigFloat.Parse(value);
                 return true;
             }
-            catch (ArgumentNullException)
+            catch (System.ArgumentNullException)
             {
                 result = null;
                 return false;
             }
-            catch (FormatException)
+            catch (System.FormatException)
             {
                 result = null;
                 return false;
@@ -833,9 +804,9 @@ namespace OsmPolygon.sunrisesunset
         public static int Compare(BigFloat left, BigFloat right)
         {
             if (BigFloat.Equals(left, null))
-                throw new ArgumentNullException("left");
+                throw new System.ArgumentNullException("left");
             if (BigFloat.Equals(right, null))
-                throw new ArgumentNullException("right");
+                throw new System.ArgumentNullException("right");
 
             return (new BigFloat(left)).CompareTo(right);
         }
