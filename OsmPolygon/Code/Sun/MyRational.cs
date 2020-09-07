@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.Extensions.FileSystemGlobbing.Internal;
 using System;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 
 namespace OsmPolygon.RationalMath
@@ -743,32 +744,34 @@ namespace OsmPolygon.RationalMath
         }
 
         // https://en.wikipedia.org/wiki/Logarithm
-        // multiplier * multiplicant = product 
-        public MyRational Multiply(int factor)
+        // multiplier * multiplicand = product 
+        // Multiplizierer pl.: die Multiplizierer
+        // Multiplikand pl.: die Multiplikanden
+        public MyRational Multiply(int multiplicand)
         {
-            MyRational other = new MyRational(factor);
+            MyRational other = new MyRational(multiplicand);
 
             return new MyRational(this.Numerator * other.Numerator, this.Denominator * other.Denominator);
         }
 
 
-        public MyRational Multiply(uint factor)
+        public MyRational Multiply(uint multiplicand)
         {
-            MyRational other = new MyRational(factor);
+            MyRational other = new MyRational(multiplicand);
 
             return new MyRational(this.Numerator * other.Numerator, this.Denominator * other.Denominator);
         }
 
-        public MyRational Multiply(long factor)
+        public MyRational Multiply(long multiplicand)
         {
-            MyRational other = new MyRational(factor);
+            MyRational other = new MyRational(multiplicand);
 
             return new MyRational(this.Numerator * other.Numerator, this.Denominator * other.Denominator);
         }
 
-        public MyRational Multiply(ulong factor)
+        public MyRational Multiply(ulong multiplicand)
         {
-            MyRational other = new MyRational(factor);
+            MyRational other = new MyRational(multiplicand);
 
             return new MyRational(this.Numerator * other.Numerator, this.Denominator * other.Denominator);
         }
@@ -1320,6 +1323,7 @@ namespace OsmPolygon.RationalMath
         // logn(x) = ln(x)/ln(n).
         public static double log(double x, double n, double epsilon)
         {
+
             return ln(x, epsilon) / ln(n, epsilon);
         }
 
@@ -1336,9 +1340,17 @@ namespace OsmPolygon.RationalMath
         // which has cubic convergence to ln(x).
         public static double lne(double x, double epsilon)
         {
+            // ln(x < 0) ==> complex number
+            // ln(0) ==> e^x=0 - There is no number x to satisfy this equation.
+            // Heck, even if you invoke the surreal numbers(the largest ordered field of numbers ever), 
+            // you're not going to find a solution for  ex=0 
+            // The limit of the natural logarithm of x when x approaches zero from the positive side (0+) is minus infinity
+            if (x <= 0)
+                throw new System.ArithmeticException("lne(x<=0) = undefined");
+
             // https://en.wikipedia.org/wiki/Natural_logarithm#High_precision
-            double yn = x;
-            double yn1 = x;
+            double yn = x - 1.0d;
+            double yn1 = yn;
 
             do
             {
@@ -1350,6 +1362,25 @@ namespace OsmPolygon.RationalMath
         }
 
 
+        public static double logN(double x, double n, double epsilon)
+        {
+            if (n == 1.0d)
+                return 0.0d;
+
+            if (n == 0.0d)
+                throw new System.ArithmeticException("logN(x,0) = undefined");
+
+            return ln(x, epsilon) / ln(n, epsilon);
+        }
+
+
+        // https://en.wikipedia.org/wiki/Logarithm#Logarithmic_identities
+        // logB(x/y) = logB(x) - logB(y) 
+        public static double logNRational(double nominator, double denominator, double n, double epsilon)
+        {
+            return logN(nominator, n, epsilon) - logN(denominator, n, epsilon);
+        }
+        
 
         public static void LogTest()
         {
