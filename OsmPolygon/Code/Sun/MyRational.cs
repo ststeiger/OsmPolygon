@@ -1,9 +1,4 @@
 ﻿
-using Microsoft.Extensions.FileSystemGlobbing.Internal;
-using System;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
-
 namespace OsmPolygon.RationalMath
 {
 
@@ -12,7 +7,7 @@ namespace OsmPolygon.RationalMath
     // https://docs.oracle.com/javase/7/docs/api/java/math/RoundingMode.html
     public enum RoundingMode
     {
-        CEILING // Rounding mode to round towards positive infinity.
+          CEILING // Rounding mode to round towards positive infinity.
         , DOWN // Rounding mode to round towards zero.
         , FLOOR // Rounding mode to round towards negative infinity.
         , HALF_DOWN // Rounding mode to round towards "nearest neighbor" unless both neighbors are equidistant, in which case round down.
@@ -426,7 +421,7 @@ namespace OsmPolygon.RationalMath
 
 
         #region System.IComparable<MyRational>
-        int IComparable<MyRational>.CompareTo(MyRational other)
+        int System.IComparable<MyRational>.CompareTo(MyRational other)
         {
             return MyCompare(this, other);
         }
@@ -450,7 +445,7 @@ namespace OsmPolygon.RationalMath
 
         #region System.IEquatable<MyRational>
 
-        bool IEquatable<MyRational>.Equals(MyRational other)
+        bool System.IEquatable<MyRational>.Equals(MyRational other)
         {
             if (other == null)
                 throw new System.ArgumentNullException("other");
@@ -460,7 +455,7 @@ namespace OsmPolygon.RationalMath
 
         public bool Equals(MyRational other)
         {
-            return ((IEquatable<MyRational>)this).Equals(other);
+            return ((System.IEquatable<MyRational>)this).Equals(other);
         }
 
         #endregion // System.IEquatable<MyRational>
@@ -851,6 +846,18 @@ namespace OsmPolygon.RationalMath
 
 
 
+        public static MyRational operator >>(MyRational value, int shift)
+        {
+            return value.ShiftDecimalRight(shift);
+        }
+
+
+        public static MyRational operator <<(MyRational value, int shift)
+        {
+            return value.ShiftDecimalLeft(shift);
+        }
+
+
         public static MyRational operator ~(MyRational value)
         {
             // Correct ?
@@ -969,14 +976,14 @@ namespace OsmPolygon.RationalMath
                 System.Array.Reverse(ca);
 
                 // return result + "." + new string(sb.ToString().Reverse().ToArray());
-                return (Sign < 0 ? "-" : "") + result + "." + new string(ca);
+                return (Sign < 0 ? "-" : "") + System.Numerics.BigInteger.Abs(result).ToString(System.Globalization.CultureInfo.InvariantCulture) + "." + new string(ca);
             }
             // else
 
             char[] caa = sb.ToString().ToCharArray();
             System.Array.Reverse(caa);
 
-            return (Sign < 0 ? "-" : "") + result + "." + new string(caa).TrimEnd(new char[] { '0' });
+            return (Sign < 0 ? "-" : "") + System.Numerics.BigInteger.Abs(result).ToString(System.Globalization.CultureInfo.InvariantCulture) + "." + new string(caa).TrimEnd(new char[] { '0' });
         }
 
 
@@ -1278,6 +1285,26 @@ namespace OsmPolygon.RationalMath
         }
 
 
+        public MyRational ShiftDecimalLeft(int shift)
+        {
+            if (shift < 0)
+                return ShiftDecimalRight(-shift);
+
+            System.Numerics.BigInteger num = this.Numerator * System.Numerics.BigInteger.Pow(10, shift);
+            return new MyRational(num, this.Denominator);
+        }
+
+        public MyRational ShiftDecimalRight(int shift)
+        {
+            if (shift < 0)
+                return ShiftDecimalLeft(-shift);
+
+            System.Numerics.BigInteger de = this.Denominator * System.Numerics.BigInteger.Pow(10, shift);
+            return new MyRational(this.Numerator, de);
+        }
+
+
+
         // https://pwg.gsfc.nasa.gov/stargaze/Slog4.htm
         // https://www.purplemath.com/modules/logrules.htm
         // Basic Log Rules & Expanding Log Expressions
@@ -1287,6 +1314,7 @@ namespace OsmPolygon.RationalMath
 
         // logn(x) = ln(x)/ln(n)
 
+        /*
         public MyRational ln(MathContext mc)
         {
             // ln(x) can be expressed as (x^ h - 1)/ h
@@ -1306,10 +1334,10 @@ namespace OsmPolygon.RationalMath
 
 
 
-
+        
         public static double ln(double x, double h)
         {
-            return (Math.Pow(x, h) - 1) / h;
+            return (System.Math.Pow(x, h) - 1) / h;
         }
 
 
@@ -1326,7 +1354,7 @@ namespace OsmPolygon.RationalMath
 
             return ln(x, epsilon) / ln(n, epsilon);
         }
-
+        
 
         public static double log(double x, double n)
         {
@@ -1334,6 +1362,7 @@ namespace OsmPolygon.RationalMath
             double h = 0.000000001d; // where h approaches 0
             return log(x, n, h);
         }
+        */
 
 
         // Using Newton's method, the iteration simplifies to (implementation) 
@@ -1359,7 +1388,7 @@ namespace OsmPolygon.RationalMath
             } while (System.Math.Abs(yn - yn1) > epsilon);
 
             return yn1;
-        }
+        } // End Function lne 
 
 
         public static double logN(double x, double n, double epsilon)
@@ -1370,8 +1399,8 @@ namespace OsmPolygon.RationalMath
             if (n == 0.0d)
                 throw new System.ArithmeticException("logN(x,0) = undefined");
 
-            return ln(x, epsilon) / ln(n, epsilon);
-        }
+            return lne(x, epsilon) / lne(n, epsilon);
+        } // End Function logN 
 
 
         // https://en.wikipedia.org/wiki/Logarithm#Logarithmic_identities
@@ -1379,8 +1408,8 @@ namespace OsmPolygon.RationalMath
         public static double logNRational(double nominator, double denominator, double n, double epsilon)
         {
             return logN(nominator, n, epsilon) - logN(denominator, n, epsilon);
-        }
-        
+        } // End Sub logNRational 
+
 
         public static void LogTest()
         {
@@ -1396,9 +1425,9 @@ namespace OsmPolygon.RationalMath
                 double loga = lne(2, h);
                 double delta = System.Math.Abs(log2 - loga);
                 System.Console.WriteLine("{0}: {1}", i, delta);
-            }
+            } // Next i 
 
-        }
+        } // End Sub LogTest 
 
 
         // Lacks Log10, Log, Round, Ceiling, Floor, Truncate, SetScale, ToMixString
