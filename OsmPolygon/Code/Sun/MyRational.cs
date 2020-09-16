@@ -296,9 +296,10 @@ namespace OsmPolygon.RationalMath
 
         // https://www.tandfonline.com/doi/full/10.1080/0020739X.2017.1352043
         // which evaluates to a decimal giving correctly the first 20 digits of e:
-        public static readonly MyRational e = new MyRational(System.Numerics.BigInteger.Parse("611070150698522592097"), System.Numerics.BigInteger.Parse("224800145555521536000"));
+        // https://en.wikipedia.org/wiki/E_(mathematical_constant)
+        public static readonly MyRational E = new MyRational(System.Numerics.BigInteger.Parse("611070150698522592097"), System.Numerics.BigInteger.Parse("224800145555521536000"));
         // http://www.acsu.buffalo.edu/~adamcunn/spring2017/Week3Notebook.html
-        public static readonly MyRational e_Exact = new MyRational(System.Numerics.BigInteger.Parse("337310723185584470837549"), System.Numerics.BigInteger.Parse("124089680346647887872000"));
+        public static readonly MyRational E_Exact = new MyRational(System.Numerics.BigInteger.Parse("337310723185584470837549"), System.Numerics.BigInteger.Parse("124089680346647887872000"));
 
 
         // https://www.theproblemsite.com/ask/2017/09/approximation-for-the-golden-ratio
