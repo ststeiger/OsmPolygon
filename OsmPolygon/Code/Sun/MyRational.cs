@@ -1,4 +1,5 @@
 ﻿
+// https://github.com/tompazourek/Rationals/tree/master/src/Rationals
 namespace OsmPolygon.RationalMath
 {
 
@@ -17,6 +18,7 @@ namespace OsmPolygon.RationalMath
         , UP // Rounding mode to round away from zero.
     }
 
+
     // https://github.com/openjdk/jdk/blob/master/src/java.base/share/classes/java/math/MathContext.java
     public class MathContext
     {
@@ -34,6 +36,7 @@ namespace OsmPolygon.RationalMath
 
         public MyRational Epsilon;
         public RoundingMode Rounding;
+        public int Scale;
 
         // The default-values for the constructor - DRY ! 
         private const int DEFAULT_SCALE = 10;
@@ -58,6 +61,7 @@ namespace OsmPolygon.RationalMath
 
         public MathContext(int scale, RoundingMode mode)
         {
+            this.Scale = scale;
             // this.Epsilon = new MyRational(System.Numerics.BigInteger.One, System.Numerics.BigInteger.Pow(10, scale));
             this.Epsilon = new MyRational(System.Numerics.BigInteger.One, 10000);
             this.Rounding = mode;
@@ -81,12 +85,29 @@ namespace OsmPolygon.RationalMath
 
 
     // «BigRational»
+    [System.Diagnostics.DebuggerDisplay("{DebugString}")]
     public class MyRational
         : System.IComparable, System.IComparable<MyRational>, System.IEquatable<MyRational>
     {
 
         public readonly System.Numerics.BigInteger Numerator;
         public readonly System.Numerics.BigInteger Denominator;
+
+        public bool IsZero
+        {
+            get
+            {
+                return this.Numerator == System.Numerics.BigInteger.Zero;
+            }
+        }
+
+        public bool IsOne
+        {
+            get
+            {
+                return this.Numerator == this.Denominator;
+            }
+        }
 
 
         public static void Test()
@@ -96,7 +117,16 @@ namespace OsmPolygon.RationalMath
 
 
 
-            MyRational rat = new MyRational("0.5");
+            MyRational rat = new MyRational("1.125");
+            string s = rat.ToString();
+            System.Console.WriteLine( s);
+
+
+            rat = rat << 1;
+            rat = rat >> 3;
+            var x = rat.Digits;
+
+
             MyRational ata = rat.Arctan();
             System.Console.WriteLine(ata);
 
@@ -473,9 +503,10 @@ namespace OsmPolygon.RationalMath
             return this.Equals(rat);
         }
 
+
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return this.Numerator.GetHashCode() ^ this.Denominator.GetHashCode();
         }
 
 
@@ -485,7 +516,7 @@ namespace OsmPolygon.RationalMath
             return (decimal)this.Numerator / (decimal)this.Denominator;
         }
 
-
+        /*
         public int Sign
         {
             get
@@ -503,7 +534,15 @@ namespace OsmPolygon.RationalMath
                 return -1;
             }
         }
+        */
 
+        public int Sign
+        {
+            get
+            {
+                return this.Numerator.Sign * this.Denominator.Sign;
+            }
+        }
 
 
         public MyRational Negate()
@@ -945,53 +984,159 @@ namespace OsmPolygon.RationalMath
         }
 
 
-        public string ToString(int precision, bool trailingZeros = false)
+        protected System.Numerics.BigInteger? m_wholePart;
+
+        public System.Numerics.BigInteger IntegerPart
         {
-            System.Numerics.BigInteger remainder;
-            System.Numerics.BigInteger result = System.Numerics.BigInteger.DivRem(this.Numerator, this.Denominator, out remainder);
-
-            if (remainder == 0 && trailingZeros)
-                return result + ".0";
-            else if (remainder == 0)
-                return result.ToString();
-
-            System.Numerics.BigInteger decimals = System.Numerics.BigInteger.Abs((this.Numerator * System.Numerics.BigInteger.Pow(10, precision)) / this.Denominator);
-
-            if (decimals == 0 && trailingZeros)
-                return result + ".0";
-            else if (decimals == 0)
-                return result.ToString();
-
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
-
-            while (precision-- > 0 && decimals > 0)
+            get
             {
-                sb.Append(decimals % 10);
-                decimals /= 10;
+                if (this.m_wholePart.HasValue)
+                    return this.m_wholePart.Value;
+
+
+                if (this.IsZero)
+                {
+                    this.m_wholePart = System.Numerics.BigInteger.Zero;
+                    return this.m_wholePart.Value;
+                }
+
+
+                if (this.IsOne)
+                {
+                    this.m_wholePart = System.Numerics.BigInteger.One;
+                    return this.m_wholePart.Value;
+                }
+
+                this.m_wholePart = System.Numerics.BigInteger.Divide(this.Numerator, this.Denominator);
+
+                return this.m_wholePart.Value;
             }
-
-            if (trailingZeros)
-            {
-                char[] ca = sb.ToString().ToCharArray();
-                System.Array.Reverse(ca);
-
-                // return result + "." + new string(sb.ToString().Reverse().ToArray());
-                return (Sign < 0 ? "-" : "") + System.Numerics.BigInteger.Abs(result).ToString(System.Globalization.CultureInfo.InvariantCulture) + "." + new string(ca);
-            }
-            // else
-
-            char[] caa = sb.ToString().ToCharArray();
-            System.Array.Reverse(caa);
-
-            return (Sign < 0 ? "-" : "") + System.Numerics.BigInteger.Abs(result).ToString(System.Globalization.CultureInfo.InvariantCulture) + "." + new string(caa).TrimEnd(new char[] { '0' });
         }
 
 
-        public override string ToString()
+
+        protected MyRational m_fractionPart;
+
+        /// <summary>
+        /// Fractional part of the rational number, see also <seealso cref="WholePart" />.
+        /// </summary>
+        /// <example>
+        /// 4/3 = 1 + 1/3;
+        /// -10/4 = -3 + 2/4
+        /// </example>
+        public MyRational FractionalPart
         {
-            // default precision = 100
-            return ToString(100);
+            get
+            {
+                if (this.m_fractionPart != null)
+                    return this.m_fractionPart;
+
+                this.m_fractionPart = this - new MyRational(this.IntegerPart, 1);
+                return this.m_fractionPart;
+            }
         }
+
+
+        public string Digits
+        {
+            get
+            {
+                System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+                MyRational fractionPart = this.FractionalPart;
+
+                System.Numerics.BigInteger numerator = System.Numerics.BigInteger.Abs(fractionPart.Numerator);
+                System.Numerics.BigInteger denominator = System.Numerics.BigInteger.Abs(fractionPart.Denominator);
+                
+                System.Numerics.BigInteger rem = numerator%denominator;
+                numerator = rem * 10;
+                int count = 1;
+
+                while (rem != 0)
+                {
+                    System.Numerics.BigInteger divided = System.Numerics.BigInteger.DivRem(numerator, denominator, out rem);
+
+                    string digits = divided.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    sb.Append(digits);
+                    numerator = rem * 10;
+
+                    if (count > 20)
+                        break;
+
+                    count++;
+                } // Whend 
+
+                if (sb.Length == 0)
+                    sb.Append("0");
+
+                string s = sb.ToString();
+                sb.Clear();
+                sb = null;
+                
+                return s;
+            } // End get
+
+        } // End Property Digits 
+
+
+
+        /// <summary>
+        /// Formats rational number to string
+        /// </summary>
+        /// <param name="format">F for normal fraction, C for canonical fraction, W for whole+fractional</param>
+        /// <param name="formatProvider">Ignored, custom format providers are not supported</param>
+        public string ToString(string format, System.IFormatProvider formatProvider)
+        {
+            return ToString(format);
+        }
+
+
+        public string DebugString
+        {
+            get
+            {
+                string s = this.ToString() + " = " + this.ToMixString() + " = "+ this.ToDecimalString();
+                return s;
+            }
+        }
+
+
+
+        /// <summary>
+        /// Formats rational number to string
+        /// </summary>
+        /// <param name="format">F for normal fraction, C for canonical fraction, W for whole+fractional</param>
+        public string ToString(string format)
+        {
+            switch (format.ToUpperInvariant())
+            {
+                case "F": // normal fraction
+                    return ToDecimalString();
+                case "W": // as whole + fractional part
+                    {
+                        return ToMixString();
+                    }
+                case "C": // in canonical form
+                    return ToString();
+                default:
+                    throw new System.FormatException($"The '{format}' format string is not supported.");
+            }
+        }
+
+
+        public string ToDecimalString()
+        {
+            if (this.Denominator.IsOne)
+                return Numerator.ToString();
+
+            if (this.Numerator.IsZero)
+                return "0";
+
+            string signature = (this.Sign < 0 ? "-" : "");
+
+            return signature + System.Numerics.BigInteger.Abs(this.IntegerPart).ToString() + "." + this.Digits;
+        }
+
 
         public string ToRationalString()
         {
@@ -1000,22 +1145,40 @@ namespace OsmPolygon.RationalMath
                    this.Denominator.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
 
-        public MyRational IntegerPart
-        {
-            get { return this.Div(One); }
-        }
-
-        public MyRational FractionalPart
-        {
-            get { return this.Mod(One); }
-        }
-
 
         public string ToMixString()
         {
-            string s = this.IntegerPart.ToString();
-            string f = this.FractionalPart.ToRationalString();
-            return string.Concat(s, " ", f);
+            if (this.Denominator.IsOne)
+                return Numerator.ToString();
+
+            if (this.Numerator.IsZero)
+                return "0";
+
+            string signature = (this.Sign < 0 ? "-" : "");
+
+            System.Numerics.BigInteger whole = this.IntegerPart;
+            MyRational fraction = this.FractionalPart;
+
+            if (whole.IsZero)
+                return fraction.ToString();
+
+            if (fraction.IsZero)
+                return whole.ToString();
+
+            whole = System.Numerics.BigInteger.Abs(whole);
+            return string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0}{1} + {2}", signature, whole, fraction.ToRationalString());
+        }
+
+
+        public override string ToString()
+        {
+            if (this.Denominator.IsOne)
+                return Numerator.ToString();
+
+            if (this.Numerator.IsZero)
+                return "0";
+
+            return this.ToRationalString();
         }
 
 
@@ -1213,6 +1376,7 @@ namespace OsmPolygon.RationalMath
             return (y / x).Arctan(mc).Add(PI);
         }
 
+
         public MyRational Arctan2(MyRational y, MyRational x)
         {
             return Arctan2(y, x, new MathContext());
@@ -1279,6 +1443,7 @@ namespace OsmPolygon.RationalMath
             return num.Divide(denom);
         }
 
+
         public MyRational Pow(MyRational exponent)
         {
             return Pow(exponent, new MathContext());
@@ -1294,6 +1459,7 @@ namespace OsmPolygon.RationalMath
             return new MyRational(num, this.Denominator);
         }
 
+
         public MyRational ShiftDecimalRight(int shift)
         {
             if (shift < 0)
@@ -1304,7 +1470,6 @@ namespace OsmPolygon.RationalMath
         }
 
 
-
         // https://pwg.gsfc.nasa.gov/stargaze/Slog4.htm
         // https://www.purplemath.com/modules/logrules.htm
         // Basic Log Rules & Expanding Log Expressions
@@ -1313,6 +1478,7 @@ namespace OsmPolygon.RationalMath
         // 3) logb(mn) = n · logb(m)
 
         // logn(x) = ln(x)/ln(n)
+
 
         /*
         public MyRational ln(MathContext mc)
@@ -1420,7 +1586,7 @@ namespace OsmPolygon.RationalMath
             for (int i = 0; i < 15; ++i)
             {
                 h /= 10.0d;
-
+                
                 // double loga = ln(2, h);
                 double loga = lne(2, h);
                 double delta = System.Math.Abs(log2 - loga);
@@ -1431,8 +1597,16 @@ namespace OsmPolygon.RationalMath
 
 
         // Lacks Log10, Log, Round, Ceiling, Floor, Truncate, SetScale, ToMixString
-        // ShiftDecimalLeft ShiftDecimalRight
-    }
+
+        // https://en.wikipedia.org/wiki/Hyperbolic_functions#Exponential_definitions
+        // https://www.efunda.com/math/hyperbolic/hyperbolic.cfm
+
+        // https://en.wikipedia.org/wiki/Hyperbola
+        // https://en.wikipedia.org/wiki/Approximations_of_%CF%80#Modern_algorithms
+        // https://en.wikipedia.org/wiki/Approximations_of_%CF%80#Gregory%E2%80%93Leibniz_series
 
 
-}
+    } // End Class MyRational 
+
+
+} // End Namespace OsmPolygon.RationalMath 
