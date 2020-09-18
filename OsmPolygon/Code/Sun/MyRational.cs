@@ -1128,7 +1128,7 @@ namespace OsmPolygon.RationalMath
         public string ToDecimalString()
         {
             if (this.Denominator.IsOne)
-                return Numerator.ToString();
+                return Numerator.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
             if (this.Numerator.IsZero)
                 return "0";
@@ -1150,7 +1150,7 @@ namespace OsmPolygon.RationalMath
         public string ToMixString()
         {
             if (this.Denominator.IsOne)
-                return Numerator.ToString();
+                return Numerator.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
             if (this.Numerator.IsZero)
                 return "0";
@@ -1174,7 +1174,7 @@ namespace OsmPolygon.RationalMath
         public override string ToString()
         {
             if (this.Denominator.IsOne)
-                return Numerator.ToString();
+                return Numerator.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
             if (this.Numerator.IsZero)
                 return "0";
@@ -1471,6 +1471,15 @@ namespace OsmPolygon.RationalMath
         }
 
 
+        // e^this aka eᵗʰᶦˢ
+        public MyRational Exp()
+        {
+            return E.Pow(this);
+        }
+
+
+
+
         // https://pwg.gsfc.nasa.gov/stargaze/Slog4.htm
         // https://www.purplemath.com/modules/logrules.htm
         // Basic Log Rules & Expanding Log Expressions
@@ -1497,11 +1506,6 @@ namespace OsmPolygon.RationalMath
         }
 
 
-
-
-
-
-        
         public static double ln(double x, double h)
         {
             return (System.Math.Pow(x, h) - 1) / h;
@@ -1538,9 +1542,10 @@ namespace OsmPolygon.RationalMath
         {
             // ln(x < 0) ==> complex number
             // ln(0) ==> e^x=0 - There is no number x to satisfy this equation.
-            // Heck, even if you invoke the surreal numbers(the largest ordered field of numbers ever), 
-            // you're not going to find a solution for  ex=0 
-            // The limit of the natural logarithm of x when x approaches zero from the positive side (0+) is minus infinity
+            // Heck, even if you invoke the surreal numbers (the largest ordered field of numbers ever), 
+            // you're not going to find a solution for e^x=0 
+            // The limit of the natural logarithm of x when x approaches zero 
+            // from the positive side (0+) is minus infinity
             if (x <= 0)
                 throw new System.ArithmeticException("lne(x<=0) = undefined");
 
