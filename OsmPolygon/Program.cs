@@ -187,7 +187,6 @@ namespace OsmPolygon
             public static void Test()
             {
                 MyRational.LogTest();
-                
 
                 double at = NewArcTan(0.5, 3); // Excel: arctan(0.5) = 0.463647609 rad = 26.565051177098°
                 System.Console.WriteLine(at);
