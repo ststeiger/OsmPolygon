@@ -41,6 +41,10 @@ namespace OsmPolygon
             csb.DataSource = SecretManager.GetSecret<string>("DefaultDataSource");
             csb.InitialCatalog = SecretManager.GetSecret<string>("DefaultCatalog");
 
+            // csb.DataSource = System.Environment.MachineName;
+            // csb.InitialCatalog = "COR_Basic_Demo_V4";
+
+
             csb.IntegratedSecurity = false;
 
             csb.IntegratedSecurity = System.StringComparer.OrdinalIgnoreCase.Equals(System.Environment.UserDomainName, "COR");
@@ -248,6 +252,15 @@ namespace OsmPolygon
                     System.StringComparer.InvariantCultureIgnoreCase
             );
 
+
+            
+            if (nodes.Count > 1000) 
+            {
+                System.Console.WriteLine(nodes.Count);
+                throw new System.InvalidOperationException("Densely populated area. Too many nodes to process");
+                return null;
+            }
+            
 
             foreach (System.Xml.XmlElement node in nodes)
             {

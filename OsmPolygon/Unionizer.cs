@@ -56,14 +56,27 @@ namespace OsmPolygon
             a = "[ ";
             a += " [{\"Latitude\":46.94976570000000000000,\"Longitude\":7.39213610000000000000},{\"Latitude\":46.94991580000000000000,\"Longitude\":7.39203950000000000000},{\"Latitude\":46.94993780000000000000,\"Longitude\":7.39209050000000000000},{\"Latitude\":46.94992680000000000000,\"Longitude\":7.39211730000000000000},{\"Latitude\":46.94993600000000000000,\"Longitude\":7.39215490000000000000},{\"Latitude\":46.94995790000000000000,\"Longitude\":7.39216020000000000000},{\"Latitude\":46.94997750000000000000,\"Longitude\":7.39221100000000000000},{\"Latitude\":46.94999680000000000000,\"Longitude\":7.39222180000000000000},{\"Latitude\":46.95002020000000000000,\"Longitude\":7.39229430000000000000},{\"Latitude\":46.95003670000000000000,\"Longitude\":7.39230780000000000000},{\"Latitude\":46.95007370000000000000,\"Longitude\":7.39241220000000000000},{\"Latitude\":46.95005910000000000000,\"Longitude\":7.39247120000000000000},{\"Latitude\":46.95011220000000000000,\"Longitude\":7.39263490000000000000},{\"Latitude\":46.95013420000000000000,\"Longitude\":7.39264020000000000000},{\"Latitude\":46.95013920000000000000,\"Longitude\":7.39268330000000000000},{\"Latitude\":46.95013050000000000000,\"Longitude\":7.39271260000000000000},{\"Latitude\":46.94996530000000000000,\"Longitude\":7.39284150000000000000},{\"Latitude\":46.94994370000000000000,\"Longitude\":7.39282530000000000000},{\"Latitude\":46.94988510000000000000,\"Longitude\":7.39267780000000000000},{\"Latitude\":46.94989250000000000000,\"Longitude\":7.39264830000000000000},{\"Latitude\":46.94992310000000000000,\"Longitude\":7.39263230000000000000},{\"Latitude\":46.94990710000000000000,\"Longitude\":7.39258390000000000000},{\"Latitude\":46.94991810000000000000,\"Longitude\":7.39255980000000000000},{\"Latitude\":46.94994140000000000000,\"Longitude\":7.39254650000000000000},{\"Latitude\":46.94986320000000000000,\"Longitude\":7.39229690000000000000},{\"Latitude\":46.94981010000000000000,\"Longitude\":7.39233180000000000000},{\"Latitude\":46.94979680000000000000,\"Longitude\":7.39228090000000000000},{\"Latitude\":46.94980600000000000000,\"Longitude\":7.39225950000000000000},{\"Latitude\":46.94976570000000000000,\"Longitude\":7.39213610000000000000}]";
             a += ",[{\"Latitude\":46.95004810000000000000,\"Longitude\":7.39310420000000000000},{\"Latitude\":46.95002610000000000000,\"Longitude\":7.39308810000000000000},{\"Latitude\":46.94997260000000000000,\"Longitude\":7.39293000000000000000},{\"Latitude\":46.95015020000000000000,\"Longitude\":7.39279320000000000000},{\"Latitude\":46.95017630000000000000,\"Longitude\":7.39280120000000000000},{\"Latitude\":46.95021290000000000000,\"Longitude\":7.39291920000000000000},{\"Latitude\":46.95020330000000000000,\"Longitude\":7.39294080000000000000},{\"Latitude\":46.95017710000000000000,\"Longitude\":7.39296180000000000000},{\"Latitude\":46.95018500000000000000,\"Longitude\":7.39298370000000000000},{\"Latitude\":46.95017990000000000000,\"Longitude\":7.39300230000000000000},{\"Latitude\":46.95004810000000000000,\"Longitude\":7.39310420000000000000}]";
-            a+="]";
+            a += "]";
+
+
+            // 17+19
+            a = "[ ";
+            a += " [{\"Latitude\":46.88860330000000000000,\"Longitude\":7.49822180000000000000},{\"Latitude\":46.88863710000000000000,\"Longitude\":7.49820240000000000000},{\"Latitude\":46.88862600000000000000,\"Longitude\":7.49816110000000000000},{\"Latitude\":46.88879070000000000000,\"Longitude\":7.49806660000000000000},{\"Latitude\":46.88879920000000000000,\"Longitude\":7.49809820000000000000},{\"Latitude\":46.88883680000000000000,\"Longitude\":7.49807670000000000000},{\"Latitude\":46.88887590000000000000,\"Longitude\":7.49822280000000000000},{\"Latitude\":46.88863990000000000000,\"Longitude\":7.49835820000000000000},{\"Latitude\":46.88860330000000000000,\"Longitude\":7.49822180000000000000}]";
+            a += ",[{\"Latitude\":46.88863990000000000000,\"Longitude\":7.49835820000000000000},{\"Latitude\":46.88828220000000000000,\"Longitude\":7.49856350000000000000},{\"Latitude\":46.88824520000000000000,\"Longitude\":7.49842520000000000000},{\"Latitude\":46.88840000000000000000,\"Longitude\":7.49833640000000000000},{\"Latitude\":46.88839070000000000000,\"Longitude\":7.49830160000000000000},{\"Latitude\":46.88855590000000000000,\"Longitude\":7.49820680000000000000},{\"Latitude\":46.88856570000000000000,\"Longitude\":7.49824340000000000000},{\"Latitude\":46.88860330000000000000,\"Longitude\":7.49822180000000000000},{\"Latitude\":46.88863990000000000000,\"Longitude\":7.49835820000000000000}]";
+            a += "]";
+
+            // 21 + 23
+            a = "[ ";
+            a += " [{\"Latitude\":46.88925940000000000000,\"Longitude\":7.49783360000000000000},{\"Latitude\":46.88929810000000000000,\"Longitude\":7.49781090000000000000},{\"Latitude\":46.88928660000000000000,\"Longitude\":7.49777260000000000000},{\"Latitude\":46.88942850000000000000,\"Longitude\":7.49769110000000000000},{\"Latitude\":46.88953300000000000000,\"Longitude\":7.49769160000000000000},{\"Latitude\":46.88953480000000000000,\"Longitude\":7.49783590000000000000},{\"Latitude\":46.88929780000000000000,\"Longitude\":7.49797440000000000000},{\"Latitude\":46.88925940000000000000,\"Longitude\":7.49783360000000000000}]";
+            a += ",[{\"Latitude\":46.88925940000000000000,\"Longitude\":7.49783360000000000000},{\"Latitude\":46.88929780000000000000,\"Longitude\":7.49797440000000000000},{\"Latitude\":46.88899300000000000000,\"Longitude\":7.49815240000000000000},{\"Latitude\":46.88895090000000000000,\"Longitude\":7.49799820000000000000},{\"Latitude\":46.88922200000000000000,\"Longitude\":7.49783990000000000000},{\"Latitude\":46.88922570000000000000,\"Longitude\":7.49785330000000000000},{\"Latitude\":46.88925940000000000000,\"Longitude\":7.49783360000000000000}]";
+            a += "]";
 
 
             System.Collections.Generic.List<System.Collections.Generic.List<OSM.API.v0_6.GeoPoint>> ls =
                 Newtonsoft.Json.JsonConvert.DeserializeObject<System.Collections.Generic.List<System.Collections.Generic.List<OSM.API.v0_6.GeoPoint>>>(a);
 
 
-            ls = FineGrainedHullPoints(ls, 100);
+            // ////////////////////ls = FineGrainedHullPoints(ls, 100);
             System.Collections.Generic.List<OSM.API.v0_6.GeoPoint> lsUnionPolygonPoints = GetUnionPolygon(ls);
 
             // System.Collections.Generic.List<OSM.API.v0_6.GeoPoint> lsUnionPolygonPoints =
@@ -72,7 +85,10 @@ namespace OsmPolygon
 
 
             // string insertString = CreateInsertScript(lsUnionPolygonPoints, "1a23fd48-406e-4d20-8693-4b8786234d37");
-            string insertString = CreateInsertScript(lsUnionPolygonPoints, "C0F5CAD2-6BA8-4390-A26C-C6682D1DE4F2");
+            // string insertString = CreateInsertScript(lsUnionPolygonPoints, "C0F5CAD2-6BA8-4390-A26C-C6682D1DE4F2");
+            // string insertString = CreateInsertScript(lsUnionPolygonPoints, "625A6B9A-88DA-454B-B472-0B8C156B3C36");
+            string insertString = CreateInsertScript(lsUnionPolygonPoints, "2643530C-F626-4A9C-899A-A8B2857923CE");
+            
             System.Console.WriteLine(insertString);
         }
         // http://www.rotefabrik.free.fr/concave_hull/
@@ -164,6 +180,20 @@ namespace OsmPolygon
 
 
 
+            
+
+            if (ig is NetTopologySuite.Geometries.Polygon)
+            {
+                System.Console.WriteLine("mulip");
+                goto SIMPLIFY_POLYGON_AND_GET_UNION;
+            }
+
+
+            if (!(ig is NetTopologySuite.Geometries.MultiPolygon))
+            {
+                System.Console.WriteLine("Error: Geometry is not a multipolygon!");
+                throw new System.InvalidOperationException("Geometry is not a multipolygon");
+            }
 
 
             NetTopologySuite.Geometries.MultiPolygon lalala = (NetTopologySuite.Geometries.MultiPolygon)ig;
@@ -180,7 +210,7 @@ namespace OsmPolygon
             var cc = new NetTopologySuite.Hull.ConcaveHull(ig, 0.00001);
             ig = cc.GetConcaveHull;
 
-
+            SIMPLIFY_POLYGON_AND_GET_UNION:
 
             ig = NetTopologySuite.Simplify.DouglasPeuckerSimplifier.Simplify(ig, 0.00001);
             NetTopologySuite.Geometries.Polygon unionPolygon = (NetTopologySuite.Geometries.Polygon)ig;

@@ -24,7 +24,25 @@ namespace OsmPolygon
             // args = new string[] { "37037133" };
             // args = new string[] { "377701803" };
             // args = new string[] { "101768609", "442482822", "442482820" };
-            args = new string[] { "218557959" };
+            
+            args = new string[] {
+                "253859981",
+                "214769435",
+                "43012950",
+                "205085020",
+                "54032923",
+                "44528978",
+                "249759838",
+                "58080194"
+            };
+
+
+            
+            args = new string[] { "253859981", "249759838" };// 21 + 23
+            args = new string[] { "249759837", "253859979"  };// 17+19
+
+            args = new string[] { "123373208" }; //"129357845" };
+
 
             for (int i = 0; i < args.Length; ++i)
             {
@@ -215,24 +233,31 @@ namespace OsmPolygon
 
         static void Main(string[] args)
         {
-            Continued.Test();
+            // Continued.Test();
 
-            RationalMath.MyRational.Test();
-            FixedMath.FixedDecimalTests.TestMe(123.456M);
+            // RationalMath.MyRational.Test();
+            // FixedMath.FixedDecimalTests.TestMe(123.456M);
 
             // OsmPolygon.Concave.COORDS.TestCoordinateConversion.Test(); // Bad 
             // Concave.Hull2.ComputeHull(); // Bad
 
-            // Unionizer.Test(); // Merge N polygons to 1 Polygon with Concave Hull
 
-            // Do it all automatically: 
-            // OsmPolyonFinder.GetAndInsertBuildingPolygon();
+
+
             // EsriConverter.ESRI.Test();
             // MoveMe.MoveMe.TestArea();
 
+            // OsmPolygonHelper.Test();
+
+
+            // Do it all automatically: 
+            // OsmPolyonFinder.GetAndInsertBuildingPolygon();
+
+            // Do it manually 
             CreateImportScriptForPolygonByWayId(args);
 
-            // OsmPolygonHelper.Test();
+            // Union of polygons 
+            // Unionizer.Test(); // Merge N polygons to 1 Polygon with Concave Hull
 
             WaitForExit();
         } // End Sub Main 
