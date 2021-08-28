@@ -14,34 +14,20 @@ namespace OsmPolygon
             // Do it manually: 
             // args = new string[] { "464651233", "95691336", "148117240", "104041936", "43012904", "49589463", "224285187", "58080194", "479999588", "218557958"  };
             // args = new string[] { "224267897", "224269589" }; 
-            // args = new string[] { "58080208", "464651232" };  
-            // args = new string[] { "58080208", "464651232" }; 
-            // args = new string[] { "690355074", "690355077", "690355073" }; 
-            // args = new string[] { "690355074" }; 
-            // args = new string[] { "326116406", "176675521" }; 
-            // args = new string[] { "100787726", "100787718", "337954728"}; 
-
             // args = new string[] { "37037133" };
-            // args = new string[] { "377701803" };
-            // args = new string[] { "101768609", "442482822", "442482820" };
             
-            args = new string[] {
-                "253859981",
-                "214769435",
-                "43012950",
-                "205085020",
-                "54032923",
-                "44528978",
-                "249759838",
-                "58080194"
+            args = new string[] { "215784643" };
+            string[] gb_uids = new string[] {
+                 "AD293F14-CB6F-46AF-89CC-BDAE0D284C6F"
             };
 
+            // gb_uids = null;
 
-            
-            args = new string[] { "253859981", "249759838" };// 21 + 23
-            args = new string[] { "249759837", "253859979"  };// 17+19
 
-            args = new string[] { "123373208" }; //"129357845" };
+            if (gb_uids!= null && gb_uids.Length != args.Length)
+            {
+                throw new System.Exception("wayid[].length != gb_uids[].length");
+            }
 
 
             for (int i = 0; i < args.Length; ++i)
@@ -49,7 +35,12 @@ namespace OsmPolygon
                 string way = args[i];
                 System.Console.WriteLine($"i[{i}]: {way}");
 
-                string script = OSM.API.v0_6.Polygon.GetPointsInsert(way, "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA");
+                string script = "";
+                if (gb_uids == null)
+                    script = OSM.API.v0_6.Polygon.GetPointsInsert(way, "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA");
+                else
+                    script = OSM.API.v0_6.Polygon.GetPointsInsert(way, gb_uids[i]);
+
                 System.IO.File.WriteAllText(way + ".sql", script, System.Text.Encoding.UTF8);
                 System.Console.WriteLine(script);
             } // Next i 
