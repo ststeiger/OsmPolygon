@@ -41,8 +41,8 @@ namespace OsmPolygon
             csb.DataSource = SecretManager.GetSecret<string>("DefaultDataSource");
             csb.InitialCatalog = SecretManager.GetSecret<string>("DefaultCatalog");
 
-            // csb.DataSource = System.Environment.MachineName;
-            // csb.InitialCatalog = "COR_Basic_Demo_V4";
+            csb.DataSource = System.Environment.MachineName;
+            csb.InitialCatalog = "COR_Basic_Demo_V4";
 
 
             csb.IntegratedSecurity = false;
@@ -237,6 +237,10 @@ namespace OsmPolygon
 
 
             System.Xml.XmlDocument doc = new System.Xml.XmlDocument();
+
+            if (xml == null)
+                return null;
+
             doc.LoadXml(xml);
 
             System.Xml.XmlNodeList nodes = doc.SelectNodes("//node");
@@ -257,8 +261,8 @@ namespace OsmPolygon
             if (nodes.Count > 1000) 
             {
                 System.Console.WriteLine(nodes.Count);
-                throw new System.InvalidOperationException("Densely populated area. Too many nodes to process");
-                return null;
+                // throw new System.InvalidOperationException("Densely populated area. Too many nodes to process");
+                // return null;
             }
             
 

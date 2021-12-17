@@ -42,7 +42,29 @@ namespace OsmPolygon
             args = new string[] { "249759837", "253859979"  };// 17+19
 
             args = new string[] { "123373208" }; //"129357845" };
+            args = new string[] { "464651233", "43012905" }; // Alexandraweg 24
 
+            args = new string[] { "265482599", "265482596", "265482597", "265482598" }; // GE01 Hauptgebäude, Durchgang, Seminar, Internat
+
+
+            args = new string[] { "224283244" }; // 
+            args = new string[] { "93142215" }; // 
+            args = new string[] { "193382499" }; // 
+            args = new string[] { "193382506" }; // 
+            args = new string[] { "193382520" }; // 
+            args = new string[] { "193382518" }; // 
+
+            args = new string[] { "193382497" }; // 
+            args = new string[] { "265794025" }; // 
+
+
+            args = new string[] { "439504669", "439504927" }; // 
+            args = new string[] { "202025119" }; // 
+            args = new string[] { "202574888" }; //
+            
+
+            args = new string[] { "608149308", "28372066" }; //
+            args = new string[] { "182936769" }; //
 
             for (int i = 0; i < args.Length; ++i)
             {
@@ -254,10 +276,13 @@ namespace OsmPolygon
             // OsmPolyonFinder.GetAndInsertBuildingPolygon();
 
             // Do it manually 
-            CreateImportScriptForPolygonByWayId(args);
+            /////// CreateImportScriptForPolygonByWayId(args);
 
             // Union of polygons 
-            // Unionizer.Test(); // Merge N polygons to 1 Polygon with Concave Hull
+            ////////////Unionizer.Test(); // Merge N polygons to 1 Polygon with Concave Hull
+
+            Unionizer.UnionizePolygonsByWayId();
+
 
             WaitForExit();
         } // End Sub Main 
