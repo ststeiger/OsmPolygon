@@ -1,6 +1,7 @@
 ﻿
 using OsmPolygon.RationalMath;
 
+
 namespace OsmPolygon
 {
 
@@ -46,6 +47,8 @@ namespace OsmPolygon
             } // Next i 
 
         } // End Sub CreateImportScriptForPolygonByWayId 
+
+
 
         //get closest Longitude that is on a 15 deg multiple.
         public static double calculate_LongitudeTimeZone(double longitude)
@@ -245,10 +248,14 @@ namespace OsmPolygon
             // OsmPolyonFinder.GetAndInsertBuildingPolygon();
 
             // Do it manually 
-            CreateImportScriptForPolygonByWayId(args);
+            //////////CreateImportScriptForPolygonByWayId(args);
 
             // Union of polygons 
-            // Unionizer.Test(); // Merge N polygons to 1 Polygon with Concave Hull
+            /////// Unionizer.Test(); // Merge N polygons to 1 Polygon with Concave Hull
+
+
+            Unionizer.UnionizePolygonsByWayId();
+
 
             WaitForExit();
         } // End Sub Main 
