@@ -15,6 +15,11 @@ namespace OsmPolygon
             if (!System.IO.File.Exists(jsonFile))
                 ProxyHelper.GetProxyList(htmlFile, jsonFile);
 
+
+            if (!System.IO.File.Exists(jsonFile))
+                return null;
+
+
             string jsonTable = System.IO.File.ReadAllText(jsonFile, System.Text.Encoding.UTF8);
             return GetProxyArray(jsonTable);
         } // End Function GetProxyArray 
@@ -93,6 +98,13 @@ namespace OsmPolygon
             
             HtmlAgilityPack.HtmlNode tableNode = doc.DocumentNode.SelectSingleNode(selector);
             System.Console.WriteLine(tableNode);
+
+            if (tableNode == null)
+            {
+                System.Console.WriteLine("GetProxyList: TableNode is NULL. \r\nFailed to fetch proxy list.");
+                return;
+            }
+                
 
             HtmlAgilityPack.HtmlNodeCollection ths = tableNode.SelectNodes("./thead/tr/th");
             foreach (HtmlAgilityPack.HtmlNode th in ths)

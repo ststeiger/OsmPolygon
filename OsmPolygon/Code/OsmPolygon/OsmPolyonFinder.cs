@@ -165,7 +165,9 @@ namespace OsmPolygon
             string proxy = null;
 
         REPEAT_UNTIL_SUCCESS:
-            proxy = proxyList[s_rnd.Next(0, proxyList.Length)];
+
+            if(proxyList != null)
+                proxy = proxyList[s_rnd.Next(0, proxyList.Length)];
 
             // proxy = "139.162.38.191:80";
             // proxy = "178.128.51.105";
@@ -274,8 +276,8 @@ namespace OsmPolygon
 
                 decimal dlat = 0;
                 decimal dlong = 0;
-                decimal.TryParse(nodeLat, out dlat);
-                decimal.TryParse(nodeLong, out dlong);
+                decimal.TryParse(nodeLat, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out dlat);
+                decimal.TryParse(nodeLong, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out dlong);
 
                 nodeDictionary[id] = new GeoApis.LatLng(dlat, dlong);
             } // Next node 

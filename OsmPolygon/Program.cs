@@ -245,7 +245,7 @@ namespace OsmPolygon
 
 
             // Do it all automatically: 
-            // OsmPolyonFinder.GetAndInsertBuildingPolygon();
+            OsmPolyonFinder.GetAndInsertBuildingPolygon();
 
             // Do it manually 
             //////////CreateImportScriptForPolygonByWayId(args);
@@ -254,7 +254,7 @@ namespace OsmPolygon
             /////// Unionizer.Test(); // Merge N polygons to 1 Polygon with Concave Hull
 
 
-            Unionizer.UnionizePolygonsByWayId();
+            // Unionizer.UnionizePolygonsByWayId();
 
 
             WaitForExit();
