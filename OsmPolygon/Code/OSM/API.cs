@@ -105,7 +105,18 @@ namespace OSM.API.v0_6
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
             sb.AppendLine();
             sb.AppendLine("DECLARE @gb_uid uniqueidentifier;");
-            sb.AppendLine("SET @gb_uid = '';");
+
+            sb.Append("SET @gb_uid = '");
+
+
+            if (!string.IsNullOrEmpty(gb_uid))
+            {
+                sb.Append(gb_uid);
+            }
+            
+            sb.AppendLine("';");
+            
+            
             sb.AppendLine();
             sb.AppendLine(@"DELETE FROM T_ZO_Objekt_Wgs84Polygon WHERE ZO_OBJ_WGS84_GB_UID = @gb_uid; ");
             sb.AppendLine();

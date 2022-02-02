@@ -17,10 +17,11 @@ namespace OsmPolygon
             // args = new string[] { "224267897", "224269589" }; 
             // args = new string[] { "37037133" };
             
-            args = new string[] { "215784643" };
+            args = new string[] { "31479761" };
             string[] gb_uids = new string[] {
-                 "AD293F14-CB6F-46AF-89CC-BDAE0D284C6F"
+                 "C3069C37-4C48-4047-9FDC-2E7C70CA6FC6"
             };
+             
 
             // gb_uids = null;
 
@@ -38,7 +39,7 @@ namespace OsmPolygon
 
                 string script = "";
                 if (gb_uids == null)
-                    script = OSM.API.v0_6.Polygon.GetPointsInsert(way, "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA");
+                    script = OSM.API.v0_6.Polygon.GetPointsInsert(way, null);
                 else
                     script = OSM.API.v0_6.Polygon.GetPointsInsert(way, gb_uids[i]);
 
@@ -245,10 +246,10 @@ namespace OsmPolygon
 
 
             // Do it all automatically: 
-            OsmPolyonFinder.GetAndInsertBuildingPolygon();
+            // OsmPolyonFinder.GetAndInsertBuildingPolygon();
 
             // Do it manually 
-            //////////CreateImportScriptForPolygonByWayId(args);
+            CreateImportScriptForPolygonByWayId(args);
 
             // Union of polygons 
             /////// Unionizer.Test(); // Merge N polygons to 1 Polygon with Concave Hull
