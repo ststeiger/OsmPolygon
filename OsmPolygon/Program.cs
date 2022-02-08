@@ -17,11 +17,11 @@ namespace OsmPolygon
             // args = new string[] { "224267897", "224269589" }; 
             // args = new string[] { "37037133" };
             
-            args = new string[] { "324267608" };
+            args = new string[] { "42301577" };
             string[] gb_uids = new string[] {
-                 "5C0AD413-3EDC-43EF-A3BD-8D54D478812A"
+                 "F2A4C3E0-41A9-4AAA-BC49-04D55B5397A4"
             };
-            
+
             // gb_uids = null;
 
 
@@ -245,7 +245,7 @@ namespace OsmPolygon
 
 
             // Do it all automatically: 
-            // OsmPolyonFinder.GetAndInsertBuildingPolygon();
+            /////////////// OsmPolyonFinder.GetAndInsertBuildingPolygon();
 
             // Do it manually 
             CreateImportScriptForPolygonByWayId(args);

@@ -211,6 +211,14 @@ namespace OsmPolygon
                         System.Console.WriteLine("401");
                     }
 
+
+                    if (response.StatusCode == (System.Net.HttpStatusCode)509)
+                    {
+                        System.Console.WriteLine("509 - Bandwidth Limit Exceeded.");
+                        const int twentyMinutes = 1000 * 60 * 20;
+                        System.Threading.Thread.Sleep(twentyMinutes);
+                    }
+
                     string responseHtml = null;
                     using (System.IO.Stream responseStream = response.GetResponseStream())
                     {
@@ -402,7 +410,7 @@ SELECT
 
                     GeoApis.Polygon nearestBuilding = GetNearestBuildingPolygon(building.GB_GM_Lat, building.GB_GM_Lng);
                     if (nearestBuilding == null)
-                        continue;
+                        continue; 
 
                     System.Console.WriteLine(nearestBuilding);
                     System.Console.WriteLine(nearestBuilding.OsmId); // 218003784
