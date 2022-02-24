@@ -17,11 +17,13 @@ namespace OsmPolygon
             // args = new string[] { "224267897", "224269589" }; 
             // args = new string[] { "37037133" };
             
-            args = new string[] { "41087904" };
+            args = new string[] { "87342188", "87342096" };
             string[] gb_uids = new string[] {
-                 "83D84846-3841-4AB1-9F1D-5C11A7FCA1FD"
+                 "56A219A7-44E5-4660-996B-3D193E4D7070"
+                 ,"D0F180F3-2827-4FCC-AF51-5B328C94FC18"
             };
 
+            
 
 
             // gb_uids = null;
