@@ -16,20 +16,19 @@ namespace OsmPolygon
             // args = new string[] { "464651233", "95691336", "148117240", "104041936", "43012904", "49589463", "224285187", "58080194", "479999588", "218557958"  };
             // args = new string[] { "224267897", "224269589" }; 
             // args = new string[] { "37037133" };
-            
-            args = new string[] { "87342188", "87342096" };
+
+            args = new string[] { "685237191", "685237189" };
             string[] gb_uids = new string[] {
-                 "56A219A7-44E5-4660-996B-3D193E4D7070"
-                 ,"D0F180F3-2827-4FCC-AF51-5B328C94FC18"
+                 "FB1675AA-47B6-494A-852D-E9336088464A"
+                 ,"85C0ADB3-17DA-4225-8882-72693093187F"
             };
 
-            
 
 
             // gb_uids = null;
 
 
-            if (gb_uids!= null && gb_uids.Length != args.Length)
+            if (gb_uids != null && gb_uids.Length != args.Length)
             {
                 throw new System.Exception("wayid[].length != gb_uids[].length");
             }
@@ -67,7 +66,7 @@ namespace OsmPolygon
         // http://www.luschny.de/math/factorial/csharp/FactorialSplit.cs.html
         public static class FactorialSplit
         {
-            
+
 
             public static System.Numerics.BigInteger Factorial(int n)
             {
@@ -76,7 +75,7 @@ namespace OsmPolygon
                     throw new System.ArgumentOutOfRangeException("n", nameof(FactorialSplit) + "." + nameof(Factorial) + ": n >= 0 required, but was " + n);
                 }
 
-                if (n < 2) 
+                if (n < 2)
                     return System.Numerics.BigInteger.One;
 
                 ulong[] knownFactorials = new ulong[] { 1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800, 479001600, 6227020800, 87178291200, 1307674368000, 20922789888000, 355687428096000, 6402373705728000, 121645100408832000 };
@@ -89,7 +88,7 @@ namespace OsmPolygon
                 System.Numerics.BigInteger currentN = System.Numerics.BigInteger.One;
 
                 int h = 0, shift = 0, high = 1;
-                int log2n = (int) System.Math.Floor(System.Numerics.BigInteger.Log(n) / System.Numerics.BigInteger.Log(2));
+                int log2n = (int)System.Math.Floor(System.Numerics.BigInteger.Log(n) / System.Numerics.BigInteger.Log(2));
                 while (h != n)
                 {
                     shift += h;
@@ -149,7 +148,7 @@ namespace OsmPolygon
                 return new FractionParameters()
                 {
                     Ai = n > 0 ? (2 * n - 1) : a0,
-                    Bi = (n == 0 ? z : n*n* z*z )
+                    Bi = (n == 0 ? z : n * n * z * z)
                 };
             }
 
@@ -170,7 +169,7 @@ namespace OsmPolygon
                 } // Next ni 
 
                 double omg = foo(0, z).Ai;
-                return  omg + temp;
+                return omg + temp;
             } // End Function ArcTan 
 
 
@@ -190,11 +189,11 @@ namespace OsmPolygon
                     // 2 ==> 3, 1
                     // 1 ==> 1, 0.25
                     int Ai = (2 * n - 1);
-                    double Bi = n*n * z*z;
-                    
+                    double Bi = n * n * z * z;
+
                     temp = Bi / (Ai + temp);
                 } // Next n 
-                
+
                 // 0, 0.5
                 return z / temp;
             } // End Function NewArcTan 
@@ -263,8 +262,8 @@ namespace OsmPolygon
 
             WaitForExit();
         } // End Sub Main 
-        
-        
+
+
         public static void WaitForExit()
         {
             System.Console.Write(System.Environment.NewLine);

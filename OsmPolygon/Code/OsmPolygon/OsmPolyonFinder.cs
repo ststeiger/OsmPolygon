@@ -43,6 +43,7 @@ namespace OsmPolygon
 
             csb.DataSource = System.Environment.MachineName;
             csb.InitialCatalog = "COR_Basic_Demo_V4";
+            csb.InitialCatalog = "COR_Basic_HSLU_PROD";
 
 
             csb.IntegratedSecurity = false;
