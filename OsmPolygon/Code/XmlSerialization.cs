@@ -438,7 +438,6 @@ namespace Tools.XML
         {
             using (System.Net.WebClient client = new System.Net.WebClient())
             {
-
                 using (System.IO.Stream strm = client.OpenRead(url))
                 {
                     return DeserializeXmlFromStream<T>(strm);

@@ -76,20 +76,78 @@ namespace OSM.API.v0_6
             System.Collections.Generic.List<GeoPoint> ls = new System.Collections.Generic.List<GeoPoint>();
 
             // https://www.openstreetmap.org/api/0.6/way/73685445
-            OSM.API.v0_6.XML.OsmWayXml osm = OSM.API.v0_6.XML.OsmWayXml.FromUrl($"https://www.openstreetmap.org/api/0.6/way/{wayId}");
 
-            foreach (OSM.API.v0_6.XML.Nd node in osm.Way.Nd)
+            System.Collections.Generic.List<OSM.API.v0_6.XML.OsmWayXml> wayList = 
+                new System.Collections.Generic.List<OSM.API.v0_6.XML.OsmWayXml>();
+
+            try
             {
-                string @ref = node.Ref;
+                // the id might be a relation instead of a way. 
+                wayList.Add(
+                    OSM.API.v0_6.XML.OsmWayXml.FromUrl($"https://www.openstreetmap.org/api/0.6/way/{wayId}")
+                );
+            }
+            catch (System.Net.WebException wex)
+            {
+                System.Net.HttpWebResponse wr = wex.Response as System.Net.HttpWebResponse;
 
-                // https://www.openstreetmap.org/api/0.6/node/872697431
-                OSM.API.v0_6.XML.OsmNodeXml nodeOSM = OSM.API.v0_6.XML.OsmNodeXml.FromUrl($"https://www.openstreetmap.org/api/0.6/node/{@ref}");
-                System.Threading.Thread.Sleep(5000);
-                decimal lat = nodeOSM.Node.Lat;
-                decimal lon = nodeOSM.Node.Lon;
+                // If download of way fails, it is possible it's a relation. 
+                if (wr != null && wr.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    XML.OsmRelationXml osmXml = null;
 
-                ls.Add(new GeoPoint(lat, lon));
-            } // Next node 
+                    try
+                    {
+                        osmXml = OSM.API.v0_6.XML.OsmRelationXml.FromUrl($"https://www.openstreetmap.org/api/0.6/relation/{wayId}");
+                    } 
+                    catch (System.Exception) // Something else 
+                    { }
+                    
+                    // if it was not a relation, or the download fails as well 
+                    // the problem is something else, so throw the original exception 
+                    if (osmXml == null || osmXml.Relation == null || osmXml.Relation.Member == null)
+                        throw;
+
+                    // add each way in relation to the points we want to fetch 
+                    foreach (OSM.API.v0_6.XML.Member thisMember in osmXml.Relation.Member)
+                    {
+                        if ("way".Equals(thisMember.Type, System.StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            wayList.Add(
+                                OSM.API.v0_6.XML.OsmWayXml.FromUrl($"https://www.openstreetmap.org/api/0.6/way/{thisMember.Ref}")
+                            );
+                        } // End if "way" 
+
+                    } // Next thisMember 
+
+                }
+                else
+                    throw;
+
+            } // End Catch WebException
+            catch (System.Exception)
+            {
+                // If it's not a web-exception, something else went wrong, and we want to know what 
+                throw;
+            } // End Catch Exception
+
+            foreach (XML.OsmWayXml thisWay in wayList)
+            {
+                
+                foreach (OSM.API.v0_6.XML.Nd node in thisWay.Way.Nd)
+                {
+                    string @ref = node.Ref;
+
+                    // https://www.openstreetmap.org/api/0.6/node/872697431
+                    OSM.API.v0_6.XML.OsmNodeXml nodeOSM = OSM.API.v0_6.XML.OsmNodeXml.FromUrl($"https://www.openstreetmap.org/api/0.6/node/{@ref}");
+                    System.Threading.Thread.Sleep(5000);
+                    decimal lat = nodeOSM.Node.Lat;
+                    decimal lon = nodeOSM.Node.Lon;
+
+                    ls.Add(new GeoPoint(lat, lon));
+                } // Next node 
+
+            } // Next thisWay 
 
             return ls;
         } // End Function GetPointList 
