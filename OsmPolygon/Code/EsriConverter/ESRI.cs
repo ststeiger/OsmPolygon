@@ -6,6 +6,151 @@ namespace OsmPolygon.EsriConverter
     public class ESRI
     {
 
+        // https://map.geo.tg.ch/
+        // Grundlagen und Planung -> Grundstückkataster -> Grundbuch, Grundeigentümer -> Grundbuch
+        // Grundlagen und Planung -> Grundstückkataster -> Amtliche Vermessung -> ProjBodenbedeckung
+        // Grundlagen und Planung -> Bodenbedeckung ->  Amtliche Vermessung -> 
+        // https://map.geo.tg.ch/apps/mf-geoadmin3/?lang=de&topic=ech&catalogNodes=10000,12000,12001,12006&layers=av_wms_lcsfproj&layers_opacity=0.9&E=2734377.19&N=1267817.41&zoom=8
+
+
+        // "EPSG:2056" (LV95)  to EPSG:4326 (WGS84)
+        // https://epsg.io/transform#s_srs=2056&t_srs=4326&ops=1676&x=NaN&y=NaN
+        // https://epsg.io/transform#s_srs=2056&t_srs=4326&ops=1676&x=2734367.098&y=1267789.988
+        // https://epsg.io/map#srs=2056&x=2734380.943&y=1267793.486&z=19&layer=streets
+        public static string Test3()
+        {
+            string json = @"
+[
+    [
+        2734431.581,
+        1267805.457
+    ],
+    [
+        2734433.708,
+        1267805.979
+    ],
+    [
+        2734433.534,
+        1267806.687
+    ],
+    [
+        2734446.066,
+        1267809.776
+    ],
+    [
+        2734453.024,
+        1267781.542
+    ],
+    [
+        2734452.266,
+        1267781.357
+    ],
+    [
+        2734441.249,
+        1267778.662
+    ],
+    [
+        2734440.502,
+        1267778.479
+    ],
+    [
+        2734438.726,
+        1267785.669
+    ],
+    [
+        2734438.056,
+        1267785.504
+    ],
+    [
+        2734437.84,
+        1267786.377
+    ],
+    [
+        2734438.5,
+        1267786.54
+    ],
+    [
+        2734436.46,
+        1267794.81
+    ],
+    [
+        2734435.643,
+        1267798.125
+    ],
+    [
+        2734433.516,
+        1267797.602
+    ],
+    [
+        2734433.475,
+        1267797.767
+    ],
+    [
+        2734431.581,
+        1267805.457
+    ]
+]
+
+";
+            Newtonsoft.Json.JsonSerializerSettings settings = new Newtonsoft.Json.JsonSerializerSettings();
+            settings.Converters.Add(new XYCoordinatesNewtonsoftConverter());
+
+            System.Collections.Generic.List<XYCoordinates> coordinates = Newtonsoft.Json.JsonConvert.DeserializeObject<System.Collections.Generic.List<XYCoordinates>>(json, settings);
+
+#if false
+            foreach (XYCoordinates coord in coordinates)
+            {
+                System.Console.WriteLine(coord);
+            }
+#endif 
+
+            string sql = ProjectEsriCoordinatesToWGS84(coordinates);
+            return sql;
+        }
+
+        public static string Test2()
+        {
+            string json = @"
+ [
+    [
+        2734367.098,
+        1267789.988
+    ],
+    [
+        2734380.943,
+        1267793.486
+    ],
+    [
+        2734388.978,
+        1267761.686
+    ],
+    [
+        2734375.133,
+        1267758.188
+    ],
+    [
+        2734367.098,
+        1267789.988
+    ]
+]
+";
+
+            System.Text.Json.JsonSerializerOptions options = new System.Text.Json.JsonSerializerOptions();
+            options.Converters.Add(new XYCoordinatesConverter());
+
+            System.Collections.Generic.List<XYCoordinates> coordinates = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.List<XYCoordinates>>(json, options);
+
+#if false
+            foreach (XYCoordinates coord in coordinates)
+            {
+                System.Console.WriteLine(coord);
+            }
+#endif 
+
+
+            string sql = ProjectEsriCoordinatesToWGS84(coordinates);
+            return sql;
+        }
 
         public static string Test()
         {

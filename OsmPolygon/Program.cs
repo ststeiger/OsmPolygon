@@ -18,14 +18,16 @@ namespace OsmPolygon
             // args = new string[] { "37037133" };
 
             args = new string[] {
-                "2866715"
+                  "810215978"
+                 ,"400224839"
+                 ,"334651783"
             };
 
             string[] gb_uids = new string[] {
-                "2DC3F9D1-1B1B-4971-B8E8-F0D19604C4D3"
+                 "CBEB0A78-52EF-4C67-9C2D-03613CB70730",
+                 "B679DAE9-CAF3-4608-8BDB-50E957FB8305",
+                 "EE4C0299-4DA2-449F-9176-B95DC99C2221"
             };
-
-
 
             // gb_uids = null;
 
@@ -52,6 +54,7 @@ namespace OsmPolygon
                 System.Console.WriteLine(script);
             } // Next i 
 
+            System.Console.WriteLine("DONE !");
         } // End Sub CreateImportScriptForPolygonByWayId 
 
 
@@ -233,6 +236,10 @@ namespace OsmPolygon
 
         static void Main(string[] args)
         {
+            // string Turnhalle = EsriConverter.ESRI.Test3();
+            // string Kreativhaus = EsriConverter.ESRI.Test2();
+            // System.Console.WriteLine(Turnhalle, Kreativhaus);
+
             // Continued.Test();
 
             // RationalMath.MyRational.Test();

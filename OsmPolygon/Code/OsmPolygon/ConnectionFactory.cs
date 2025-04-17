@@ -65,7 +65,7 @@ namespace OsmPolygon
                 if ("MySql".Equals(assemblyQualifiedName, System.StringComparison.InvariantCultureIgnoreCase)
                     || "MySql.Data.MySqlClient".Equals(assemblyQualifiedName, System.StringComparison.InvariantCultureIgnoreCase)
                     )
-                    return MySql.Data.MySqlClient.MySqlClientFactory.Instance;
+                    return MySqlConnector.MySqlConnectorFactory.Instance;
 
                 if ("MS".Equals(assemblyQualifiedName, System.StringComparison.InvariantCultureIgnoreCase)
                     || "System.Data.SqlClient".Equals(assemblyQualifiedName, System.StringComparison.InvariantCultureIgnoreCase)
@@ -159,13 +159,11 @@ namespace OsmPolygon
                 csb.Database = db.Database;
 
 
-                if (db.IntegratedSecurity.HasValue)
-                    csb.IntegratedSecurity = db.IntegratedSecurity.Value;
-                else
-                    csb.IntegratedSecurity = false;
+                // if (db.IntegratedSecurity.HasValue) csb.IntegratedSecurity = db.IntegratedSecurity.Value;
+                // else csb.IntegratedSecurity = false;
 
 
-                if (!csb.IntegratedSecurity)
+                // if (!csb.IntegratedSecurity)
                 {
                     csb.Username = db.Username;
 
@@ -190,10 +188,9 @@ namespace OsmPolygon
             } // End if (object.ReferenceEquals(this.m_db.ProviderFactory.GetType(), typeof(Npgsql.NpgsqlFactory))) 
 
 
-            if (object.ReferenceEquals(df.GetType(), typeof(MySql.Data.MySqlClient.MySqlClientFactory)))
+            if (object.ReferenceEquals(df.GetType(), typeof( MySqlConnector.MySqlConnectorFactory)))
             {
-                MySql.Data.MySqlClient.MySqlConnectionStringBuilder csb =
-                    new MySql.Data.MySqlClient.MySqlConnectionStringBuilder();
+                MySqlConnector.MySqlConnectionStringBuilder csb = new MySqlConnector.MySqlConnectionStringBuilder();
 
                 csb.Server = db.Server;
 

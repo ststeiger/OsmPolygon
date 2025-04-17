@@ -257,7 +257,7 @@ namespace OsmPolygon.RationalMath
         }
 
 
-        private static void Normalize(out System.Numerics.BigInteger numerator, out System.Numerics.BigInteger denominator)
+        private static void Normalize(ref System.Numerics.BigInteger numerator, ref System.Numerics.BigInteger denominator)
         {
             // System.Numerics.BigInteger.GreatestCommonDivisor
             System.Numerics.BigInteger n = GCD(numerator, denominator);
@@ -385,7 +385,7 @@ namespace OsmPolygon.RationalMath
                 throw new System.ArgumentException("Denominator cannot be ZERO.");
             }
 
-            Normalize(out numerator, out denominator);
+            Normalize(ref numerator, ref denominator);
 
             this.Numerator = numerator;
             this.Denominator = denominator;
